@@ -88,4 +88,25 @@ function give_add_featured_image_display_settings( $content, $post_id, $thumbnai
 
 }
 
-add_filter( 'admin_post_thumbnail_html', 'give_add_featured_image_display_settings', 10, 2 );
+add_filter( 'admin_post_thumbnail_html', 'give_add_featured_image_display_settings', 10, 3 );
+
+
+/**
+ * Save give_featured_img_pos setting before give metabox setting save.
+ *
+ * @since 1.8
+ *
+ * @param int     $post_id Post id.
+ * @param WP_Post $post    Post object
+ *
+ * @return void
+ */
+function give_save_featured_image_display_settings( $post_id, $post ) {
+	// Update 'give_featured_img_pos' field
+	if ( $img_pos = esc_attr( $_REQUEST['give_featured_img_pos'] ) ) {
+		update_post_meta( $post_id, 'give_featured_img_pos', $img_pos );
+	}
+
+}
+
+add_action( 'give_pre_process_give_forms_meta', 'give_save_featured_image_display_settings', 10, 2 );
