@@ -41,26 +41,28 @@ add_action( 'post_submitbox_misc_actions', 'give_add_shortcode_to_publish_metabo
  * @since 1.8
  *
  * @param $content
- * @param $post_id
+ * @param $content
+ * @param $thumbnail_id
  *
  * @return string
  */
-function give_add_featured_image_display_settings( $content, $post_id ) {
-	global $post;
-
-	// Make sure we affect only 'give_forms' post type
-	if ( 'give_forms' != $post->post_type ) {
+function give_add_featured_image_display_settings( $content, $post_id, $thumbnail_id ) {
+	// Make sure we affect only 'give_forms' post type.
+	if ( 'give_forms' != get_post_type( $post_id ) || empty( $thumbnail_id ) ) {
 		return $content;
 	}
 
-	// Add 'featured_image_location' field
-	$field_id    = 'give_featured_img_pos';
-	$field_value = ( $field_value = esc_attr( get_post_meta( $post_id, $field_id, true ) ) ? $field_value : 'none' );
-	$field_text  = esc_html__( 'Image Position:', 'give' );
+	// Add 'give_featured_img_pos' field.
+	$field_id = 'give_featured_img_pos';
+
+	$field_value = esc_attr( get_post_meta( $post_id, $field_id, true ) );
+	$field_value = $field_value ? $field_value : 'none';
+
+	$field_text = esc_html__( 'Image Position:', 'give' );
 
 	ob_start();
 	?>
-	<div>
+	<div class="give-feature-image-metabox">
 		<p>
 			<strong class="label"><?php echo $field_text; ?></strong><br>
 			<span class="give-field-description"><?php _e( 'Please select the position you would like to display for your single donation form\'s featured image.', 'give' ); ?></span>
