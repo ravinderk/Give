@@ -27,7 +27,7 @@ function give_add_shortcode_to_publish_metabox() {
 	}
 	global $post;
 
-	//Shortcode column with select all input
+	// Shortcode column with select all input
 	$shortcode = htmlentities( '[give_form id="' . $post->ID . '"]' );
 	echo '<div class="shortcode-wrap box-sizing"><label for="shortcode-input">' . esc_html__( 'Give Form Shortcode:', 'give' ) . '</label><input onClick="this.setSelectionRange(0, this.value.length)" type="text" name="shortcode-input" id="shortcode-input" class="shortcode-input" readonly value="' . $shortcode . '"></div>';
 }
@@ -40,9 +40,9 @@ add_action( 'post_submitbox_misc_actions', 'give_add_shortcode_to_publish_metabo
  *
  * @since 1.8
  *
- * @param $content
- * @param $content
- * @param $thumbnail_id
+ * @param string $content      Featured image id.
+ * @param int    $post_id      Psot id.
+ * @param int    $thumbnail_id thumbnail id.
  *
  * @return string
  */
