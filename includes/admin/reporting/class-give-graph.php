@@ -110,8 +110,8 @@ class Give_Graph {
 	/**
 	 * Set an option
 	 *
-	 * @param $key   The option key to set
-	 * @param $value The value to assign to the key
+	 * @param string $key   The option key to set
+	 * @param string $value The value to assign to the key
 	 *
 	 * @since 1.0
 	 */
@@ -122,9 +122,11 @@ class Give_Graph {
 	/**
 	 * Get an option
 	 *
-	 * @param $key The option key to get
+	 * @param string $key The option key to get
 	 *
 	 * @since 1.0
+	 *
+	 * @return string
 	 */
 	public function get( $key ) {
 		return isset( $this->options[ $key ] ) ? $this->options[ $key ] : false;
