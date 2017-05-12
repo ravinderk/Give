@@ -1108,7 +1108,6 @@ function give_delete_donation_stats( $date_range = '', $args = array() ) {
 
 /**
  * Get Form/Payment meta.
- * @todo: implement in core
  *
  * @since 1.8.8
  *
@@ -1135,7 +1134,6 @@ function give_get_meta( $id, $meta_key, $single = false, $default = false ) {
 
 /**
  * Update Form/Payment meta.
- * @todo: implement in core
  *
  * @since 1.8.8
  *
@@ -1154,7 +1152,6 @@ function give_update_meta( $id, $meta_key, $meta_value, $prev_value = '' ) {
 
 /**
  * Delete Form/Payment meta.
- * @todo: implement in core
  *
  * @since 1.8.8
  *
