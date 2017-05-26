@@ -111,6 +111,7 @@ jQuery.noConflict();
 			if (
 				val.length <= 3 ||
 				! search_type.length ||
+				val === $search_field.data( 'prev-search-term' ) ||
 				(
 					lastKey == 16 ||
 					lastKey == 13 ||
