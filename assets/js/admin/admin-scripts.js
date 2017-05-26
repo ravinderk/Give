@@ -140,6 +140,7 @@ jQuery.noConflict();
 						beforeSend: function () {
 							select.closest('ul.chosen-results').empty();
 							$search_field.prop( 'disabled', true );
+							$search_field.data( 'prev-search-term', val );
 						},
 						success   : function (data) {
 
