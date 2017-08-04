@@ -47,54 +47,45 @@ class Give_Tools_Delete_Test_Transactions extends Give_Batch_Export {
 	 * Get the Export Data
 	 *
 	 * @access public
-	 * @since 1.5
-	 * @global object $wpdb Used to query the database using the WordPress Database API
+	 * @since  1.5
+	 * @global object       $wpdb      Used to query the database using the WordPress Database API
+	 * @global Give_Logging $give_logs Used to query logs
 	 *
 	 * @return array|bool $data The data for the CSV file
 	 */
 	public function get_data() {
-		global $wpdb;
+		/* @var Give_Logging $give_logs */
+		/* @var wpdb $wpdb */
+		global $wpdb, $give_logs;
 
-		$items = $this->get_stored_data( 'give_temp_delete_test_ids' );
+		$all_payment_ids = $this->get_stored_data( 'give_temp_delete_test_ids' );
 
-		if ( ! is_array( $items ) ) {
+		// Bailout.
+		if ( empty( $all_payment_ids ) ) {
 			return false;
 		}
 
 		$offset     = ( $this->step - 1 ) * $this->per_step;
-		$step_items = array_slice( $items, $offset, $this->per_step );
+		$step_payment_ids = array_values( array_slice( $all_payment_ids, $offset, $this->per_step, true ) );
 
-		if ( $step_items ) {
-
-			$step_ids = array(
-				'other' => array(),
-			);
-
-			foreach ( $step_items as $item ) {
-
-				$step_ids['other'][] = $item['id'];
-
-			}
+		if ( ! empty( $step_payment_ids ) ) {
 
 			$sql = array();
+			$step_payment_ids = implode( ',', $step_payment_ids );
 
-			foreach ( $step_ids as $type => $ids ) {
+			$sql[] = "DELETE FROM $wpdb->posts WHERE id IN ($step_payment_ids)";
+			$sql[] = "DELETE FROM $wpdb->postmeta WHERE post_id IN ($step_payment_ids)";
+			$sql[] = "DELETE FROM $wpdb->comments WHERE comment_post_ID IN ($step_payment_ids)";
+			
+			if( $comment_ids = $wpdb->get_col( "SELECT comment_ID FROM $wpdb->comments" ) ) {
+				$comment_ids = implode( ',', $comment_ids );
+				$sql[] = "DELETE FROM $wpdb->commentmeta WHERE comment_id NOT IN ($comment_ids)";
+			}
 
-				if ( empty( $ids ) ) {
-					continue;
-				}
-
-				$ids = implode( ',', $ids );
-
-				switch ( $type ) {
-					case 'other':
-						$sql[] = "DELETE FROM $wpdb->posts WHERE id IN ($ids)";
-						$sql[] = "DELETE FROM $wpdb->postmeta WHERE post_id IN ($ids)";
-						$sql[] = "DELETE FROM $wpdb->comments WHERE comment_post_ID IN ($ids)";
-						$sql[] = "DELETE FROM $wpdb->commentmeta WHERE comment_id NOT IN (SELECT comment_ID FROM $wpdb->comments)";
-						break;
-				}
-
+			if( $log_ids = $wpdb->get_col( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_give_log_payment_id' AND meta_value IN ($step_payment_ids)" ) ) {
+				$log_ids = implode( ',', $log_ids );
+				$sql[] = "DELETE FROM $wpdb->posts WHERE ID IN ($log_ids)";
+				$sql[] = "DELETE FROM $wpdb->postmeta WHERE post_id IN ($log_ids)";
 			}
 
 			if ( ! empty( $sql ) ) {
@@ -216,33 +207,39 @@ class Give_Tools_Delete_Test_Transactions extends Give_Batch_Export {
 			$this->delete_data( 'give_temp_delete_test_ids' );
 		}
 
-		$items = get_option( 'give_temp_delete_test_ids', false );
+		$payment_ids = get_option( 'give_temp_delete_test_ids', array() );
 
-		if ( false === $items ) {
-			$items = array();
-
+		if ( empty( $payment_ids ) ) {
 			$args = apply_filters( 'give_tools_reset_stats_total_args', array(
-				'post_type'      => 'give_payment',
-				'post_status'    => 'any',
-				'posts_per_page' => - 1,
+				'number' => - 1,
 				// ONLY TEST MODE TRANSACTIONS!!!
-				'meta_key'   => '_give_payment_mode',
-				'meta_value' => 'test'
+				'meta_query' => array(
+					'relation' => 'OR',
+
+					// all payments in test mode
+					array(
+						'key'   => '_give_payment_mode',
+						'value' => 'test'
+					),
+
+					//All payment with test Donation gateway
+					array(
+						'key'   => '_give_payment_gateway',
+						'value' => 'manual'
+					)
+				)
 			) );
 
-			$posts = get_posts( $args );
-			foreach ( $posts as $post ) {
-				$items[] = array(
-					'id'   => (int) $post->ID,
-					'type' => $post->post_type,
-				);
-			}
+			$payment = new Give_Payments_Query( $args );
+			$payment_ids = ( $payment_ids = $payment->get_payments() ) ?
+				wp_list_pluck( $payment_ids, 'ID' ) :
+				array();
 
 			// Allow filtering of items to remove with an unassociative array for each item.
 			// The array contains the unique ID of the item, and a 'type' for you to use in the execution of the get_data method.
-			$items = apply_filters( 'give_delete_test_items', $items );
+			$payment_ids = apply_filters( 'give_delete_test_items', $payment_ids );
 
-			$this->store_data( 'give_temp_delete_test_ids', $items );
+			$this->store_data( 'give_temp_delete_test_ids', $payment_ids );
 		}
 
 	}
