@@ -27,42 +27,42 @@ class Give_Tools_Delete_Donors extends Give_Batch_Export {
 
 	/**
 	 * Used to store donation id's that are going to get deleted.
-	 * @var array.
+	 * @var string
 	 * @since 1.8.12
 	 */
 	var $donation_key = 'give_temp_delete_donation_ids';
 
 	/**
 	 * Used to store donors id's that are going to get deleted.
-	 * @var array.
+	 * @var string
 	 * @since 1.8.12
 	 */
 	var $donor_key = 'give_temp_delete_donor_ids';
 
 	/**
 	 * Used to store the step where the step will be. ( 'count', 'donations', 'donors' ).
-	 * @var array.
+	 * @var string
 	 * @since 1.8.12
 	 */
 	var $step_key = 'give_temp_delete_step';
 
 	/**
 	 * Used to store to get the page count in the loop.
-	 * @var array.
+	 * @var string
 	 * @since 1.8.12
 	 */
 	var $step_on_key = 'give_temp_delete_step_on';
 
 	/**
 	 * Contain total number of step .
-	 * @var array.
+	 * @var int
 	 * @since 1.8.12
 	 */
 	var $total_step;
 
 	/**
 	 * Counting contain total number of step that completed.
-	 * @var array.
+	 * @var int
 	 * @since 1.8.12
 	 */
 	var $step_completed;
@@ -84,7 +84,7 @@ class Give_Tools_Delete_Donors extends Give_Batch_Export {
 	/**
 	 * Sets the number of items to pull on each step
 	 * @since  1.8.12
-	 * @var integer
+	 * @var int
 	 */
 	public $per_step = 10;
 
