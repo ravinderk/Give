@@ -245,6 +245,13 @@ class Give_Payment_Stats extends Give_Stats {
 				DESC LIMIT %d;", $number
 		) );
 
+		var_dump( $wpdb->prepare(
+			"SELECT {$meta_table['column']['id']} as form_id, max(meta_value) as sales
+				FROM {$meta_table['name']} WHERE meta_key='_give_form_sales' AND meta_value > 0
+				GROUP BY meta_value+0
+				DESC LIMIT %d;", $number
+		));
+
 		return $give_forms;
 	}
 

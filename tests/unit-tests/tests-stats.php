@@ -161,6 +161,9 @@ class Tests_Stats extends Give_Unit_Test_Case {
 
 		$stats        = new Give_Payment_Stats();
 		$best_selling = $stats->get_best_selling();
+		
+		var_dump( 'wpravs' );
+		var_dump( $best_selling );
 
 		//Best selling should return an array ordered by sale count
 		$this->assertTrue( ! empty( $best_selling ) );
