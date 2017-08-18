@@ -2309,7 +2309,6 @@ body.give-twentyseventeen.colors-dark form[id*="give"] fieldset {
   background-color: transparent; }
 
 .give-form-wrap {
-  overflow: hidden;
   width: 100%;
   position: relative; }
   .give-form-wrap legend {
