@@ -1064,7 +1064,7 @@ function give_default_cc_address_fields( $form_id ) {
                 <input type="text" size="6" name="card_state" id="card_state" class="card_state give-input"
                        placeholder="<?php echo $label; ?>" value="<?php echo $selected_state; ?>"/>
 			<?php endif; ?>
-        </p>
+        </p >
 		<?php
 		/**
 		 * Fires while rendering credit card billing form, after address fields.
