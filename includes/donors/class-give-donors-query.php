@@ -167,29 +167,6 @@ class Give_Donors_Query extends Give_Stats {
 	}
 
 	/**
-	 * Search
-	 *
-	 * @since  1.8.14
-	 * @access public
-	 *
-	 * @return void
-	 */
-	public function search() {
-
-		if ( ! isset( $this->args['s'] ) ) {
-			return;
-		}
-
-		$search = trim( $this->args['s'] );
-
-		if ( empty( $search ) ) {
-			return;
-		}
-
-		// @todo setup search logic
-	}
-
-	/**
 	 * Get sql query from queried array.
 	 *
 	 * @since  2.0
@@ -292,9 +269,9 @@ class Give_Donors_Query extends Give_Stats {
 				$emails_placeholder = array_fill( 0, $emails_count, '%s' );
 				$emails             = implode( ', ', $emails_placeholder );
 
-				$where .= $wpdb->prepare( " AND `email` IN( $emails ) ", $this->args['email'] );
+				$where .= $wpdb->prepare( " AND {$this->table_name}.email IN( $emails ) ", $this->args['email'] );
 			} else {
-				$where .= $wpdb->prepare( " AND `email` = %s ", $this->args['email'] );
+				$where .= $wpdb->prepare( " AND {$this->table_name}.email = %s ", $this->args['email'] );
 			}
 		}
 
