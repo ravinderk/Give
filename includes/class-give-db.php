@@ -392,6 +392,13 @@ abstract class Give_DB {
 				continue;
 			}
 
+			// Call custom sanitize functions if exist.
+			$sanitize_func_name = "sanitize_column_{$key}";
+			if( property_exists( $this, $sanitize_func_name ) ){
+				$data[ $key ] = $this->{$sanitize_func_name}();
+				continue;
+			}
+
 			switch ( $type ) {
 
 				case '%s':
