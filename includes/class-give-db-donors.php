@@ -646,4 +646,30 @@ class Give_DB_Donors extends Give_DB {
 
 		}
 	}
+
+	/**
+	 * Sanitize email column value.
+	 *
+	 * @since 1.8.14
+	 *
+	 * @param $value
+	 *
+	 * @return string
+	 */
+	private function sanitize_column_email( $value ) {
+		return sanitize_email( $value );
+	}
+
+	/**
+	 * Sanitize email column value.
+	 *
+	 * @since 1.8.14
+	 *
+	 * @param $value
+	 *
+	 * @return string
+	 */
+	private function sanitize_column_notes( $value ) {
+		return strip_tags( $value );
+	}
 }
