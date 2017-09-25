@@ -165,16 +165,16 @@ abstract class Give_DB {
 	 *
 	 * @since  1.0
 	 * @access public
-     *
-     * @param  int    $column       Column ID.
-     * @param  string $column_where Column name.
-     * @param  string $column_value Column value.
-     *
+	 *
+	 * @param  int    $column       Column ID.
+	 * @param  string $column_where Column name.
+	 * @param  string $column_value Column value.
+	 *
 	 * @return string
 	 */
 	public function get_column_by( $column, $column_where, $column_value ) {
-        /* @var WPDB $wpdb */
-        global $wpdb;
+		/* @var WPDB $wpdb */
+		global $wpdb;
 
 		// Bailout.
 		if ( empty( $column ) || empty( $column_where ) || empty( $column_value ) ) {
@@ -183,6 +183,7 @@ abstract class Give_DB {
 
 		$column_where = esc_sql( $column_where );
 		$column       = esc_sql( $column );
+
 		return $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $column_where = %s LIMIT 1;", $column_value ) );
 	}
 
@@ -191,15 +192,15 @@ abstract class Give_DB {
 	 *
 	 * @since  1.0
 	 * @access public
-     *
-     * @param  array  $data
-     * @param  string $type
-     *
+	 *
+	 * @param  array  $data
+	 * @param  string $type
+	 *
 	 * @return int
 	 */
 	public function insert( $data, $type = '' ) {
-        /* @var WPDB $wpdb */
-        global $wpdb;
+		/* @var WPDB $wpdb */
+		global $wpdb;
 
 		// Set default values.
 		$data = wp_parse_args( $data, $this->get_column_defaults() );
@@ -246,16 +247,16 @@ abstract class Give_DB {
 	 *
 	 * @since  1.0
 	 * @access public
-     *
-     * @param  int    $row_id Column ID
-     * @param  array  $data
-     * @param  string $where  Column value
-     *
+	 *
+	 * @param  int    $row_id Column ID
+	 * @param  array  $data
+	 * @param  string $where  Column value
+	 *
 	 * @return bool
 	 */
 	public function update( $row_id, $data = array(), $where = '' ) {
-        /* @var WPDB $wpdb */
-        global $wpdb;
+		/* @var WPDB $wpdb */
+		global $wpdb;
 
 		// Row ID must be positive integer
 		$row_id = absint( $row_id );
@@ -293,14 +294,14 @@ abstract class Give_DB {
 	 *
 	 * @since  1.0
 	 * @access public
-     *
-     * @param  int $row_id Column ID.
-     *
+	 *
+	 * @param  int $row_id Column ID.
+	 *
 	 * @return bool
 	 */
 	public function delete( $row_id = 0 ) {
-        /* @var WPDB $wpdb */
-        global $wpdb;
+		/* @var WPDB $wpdb */
+		global $wpdb;
 
 		// Row ID must be positive integer
 		$row_id = absint( $row_id );
@@ -321,13 +322,13 @@ abstract class Give_DB {
 	 *
 	 * @since  1.3.2
 	 * @access public
-     *
+	 *
 	 * @param  string $table The table name.
-     *
+	 *
 	 * @return bool          If the table name exists.
 	 */
 	public function table_exists( $table ) {
-        /* @var WPDB $wpdb */
+		/* @var WPDB $wpdb */
 		global $wpdb;
 
 		$table = sanitize_text_field( $table );
@@ -350,7 +351,7 @@ abstract class Give_DB {
 	/**
 	 * Register tables
 	 *
-	 * @since 1.8.9
+	 * @since  1.8.9
 	 * @access public
 	 */
 	public function register_table() {
@@ -366,5 +367,66 @@ abstract class Give_DB {
 	 * @since  1.8.9
 	 * @access public
 	 */
-	public function create_table(){}
+	public function create_table() {
+	}
+
+	/**
+	 * Sanitize the data for update/create
+	 *
+	 * @since  1.8.14
+	 * @access private
+	 *
+	 * @param  array $data The data to sanitize.
+	 *
+	 * @return array       The sanitized data, based off column defaults.
+	 */
+	public function sanitize_columns( $data ) {
+
+		$columns        = $this->get_columns();
+		$default_values = $this->get_column_defaults();
+
+		foreach ( $columns as $key => $type ) {
+
+			// Only sanitize data that we were provided
+			if ( ! array_key_exists( $key, $data ) ) {
+				continue;
+			}
+
+			switch ( $type ) {
+
+				case '%s':
+					$data[ $key ] = sanitize_text_field( $data[ $key ] );
+					break;
+
+				case '%d':
+					if (
+						! is_numeric( $data[ $key ] ) ||
+						(int) $data[ $key ] !== absint( $data[ $key ] )
+					) {
+						$data[ $key ] = $default_values[ $key ];
+					} else {
+						$data[ $key ] = absint( $data[ $key ] );
+					}
+					break;
+
+				case '%f':
+					// Convert what was given to a float
+					$value = (float) $data[ $key ];
+
+					if ( ! is_float( $value ) ) {
+						$data[ $key ] = $default_values[ $key ];
+					} else {
+						$data[ $key ] = $value;
+					}
+					break;
+
+				default:
+					$data[ $key ] = sanitize_text_field( $data[ $key ] );
+					break;
+
+			}
+		}
+
+		return $data;
+	}
 }
