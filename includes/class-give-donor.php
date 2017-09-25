@@ -249,8 +249,8 @@ class Give_Donor {
 	 * @return bool|int    False if not a valid creation, donor ID if user is found or valid creation.
 	 */
 	public function create( $data = array() ) {
-
-		if ( $this->id != 0 || empty( $data ) ) {
+		// Bailout.
+		if ( 0 !== $this->id  || empty( $data ) ) {
 			return false;
 		}
 
@@ -259,7 +259,7 @@ class Give_Donor {
 		);
 
 		$args = wp_parse_args( $data, $defaults );
-		$args = $this->sanitize_columns( $args );
+		$args = $this->db->sanitize_columns( $args );
 
 		if ( empty( $args['email'] ) || ! is_email( $args['email'] ) ) {
 			return false;
@@ -322,7 +322,7 @@ class Give_Donor {
 			return false;
 		}
 
-		$data = $this->sanitize_columns( $data );
+		$data = $this->db->sanitize_columns( $data );
 
 		/**
 		 * Fires before updating donors.
@@ -924,69 +924,6 @@ class Give_Donor {
 	 */
 	public function delete_meta( $meta_key = '', $meta_value = '' ) {
 		return Give()->donor_meta->delete_meta( $this->id, $meta_key, $meta_value );
-	}
-
-	/**
-	 * Sanitize the data for update/create
-	 *
-	 * @since  1.0
-	 * @access private
-	 *
-	 * @param  array $data The data to sanitize.
-	 *
-	 * @return array       The sanitized data, based off column defaults.
-	 */
-	private function sanitize_columns( $data ) {
-
-		$columns        = $this->db->get_columns();
-		$default_values = $this->db->get_column_defaults();
-
-		foreach ( $columns as $key => $type ) {
-
-			// Only sanitize data that we were provided
-			if ( ! array_key_exists( $key, $data ) ) {
-				continue;
-			}
-
-			switch ( $type ) {
-
-				case '%s':
-					if ( 'email' == $key ) {
-						$data[ $key ] = sanitize_email( $data[ $key ] );
-					} elseif ( 'notes' == $key ) {
-						$data[ $key ] = strip_tags( $data[ $key ] );
-					} else {
-						$data[ $key ] = sanitize_text_field( $data[ $key ] );
-					}
-					break;
-
-				case '%d':
-					if ( ! is_numeric( $data[ $key ] ) || (int) $data[ $key ] !== absint( $data[ $key ] ) ) {
-						$data[ $key ] = $default_values[ $key ];
-					} else {
-						$data[ $key ] = absint( $data[ $key ] );
-					}
-					break;
-
-				case '%f':
-					// Convert what was given to a float
-					$value = floatval( $data[ $key ] );
-
-					if ( ! is_float( $value ) ) {
-						$data[ $key ] = $default_values[ $key ];
-					} else {
-						$data[ $key ] = $value;
-					}
-					break;
-
-				default:
-					$data[ $key ] = sanitize_text_field( $data[ $key ] );
-					break;
-
-			}
-		}
-
-		return $data;
 	}
 
 	/**
