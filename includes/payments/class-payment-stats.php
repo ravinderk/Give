@@ -238,6 +238,17 @@ class Give_Payment_Stats extends Give_Stats {
 
 		$meta_table = __give_v20_bc_table_details( 'form' );
 
+		var_dump( $wpdb->get_results(
+			$wpdb->prepare(
+				"
+				SELECT form_id, meta_value FROM {$meta_table['name']}
+				WHERE meta_key=%s
+				LIMIT %d",
+				'_give_form_sales',
+				$number
+			)
+		) );
+
 		$give_forms = $wpdb->get_results( $wpdb->prepare(
 			"SELECT {$meta_table['column']['id']} as form_id, max(meta_value) as sales
 				FROM {$meta_table['name']} WHERE meta_key='_give_form_sales' AND meta_value > 0

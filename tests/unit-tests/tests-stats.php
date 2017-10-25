@@ -162,6 +162,8 @@ class Tests_Stats extends Give_Unit_Test_Case {
 		$stats        = new Give_Payment_Stats();
 		$best_selling = $stats->get_best_selling();
 
+		var_dump( $best_selling );
+
 		//Best selling should return an array ordered by sale count
 		$this->assertLessThan( $best_selling[0]->sales, $best_selling[1]->sales );
 
@@ -174,6 +176,8 @@ class Tests_Stats extends Give_Unit_Test_Case {
 		
 		$stats = new Give_Payment_Stats();
 		$sales = $stats->get_sales( $this->_new_form_id, 'this_month' );
+
+		var_dump( $sales );
 
 		$this->assertEquals( 2, $sales );
 	}
