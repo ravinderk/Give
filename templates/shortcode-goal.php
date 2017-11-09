@@ -92,9 +92,13 @@ if ( $income >= $goal ) {
 
 	<?php if ( ! empty( $show_bar ) ) : ?>
 		<div class="give-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?php echo esc_attr( $progress ); ?>">
-			<span style="width: <?php echo esc_attr( $progress ); ?>%;<?php if ( ! empty( $color ) ) {
-				echo 'background-color:' . $color;
-			} ?>"></span>
+			<?php
+			echo sprintf(
+				'<span style="width:%1$s;background-color:%2$s"></span>',
+				"{$progress}px",
+				$color
+			);
+			?>
 		</div><!-- /.give-progress-bar -->
 	<?php endif; ?>
 
