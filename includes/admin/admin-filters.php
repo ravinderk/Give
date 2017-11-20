@@ -245,11 +245,21 @@ add_filter( 'give_import_core_settings_data', 'give_import_core_settings_merge_d
  */
 function give_bc_1817_cleanup_user_roles( $caps ){
 
+	$are_user_roles_cleaned = give_get_option( '_give_bc_1817_user_roles_cleaned', false );
+
 	if (
 		! give_has_upgrade_completed( 'v1817_cleanup_user_roles' ) &&
-		! isset( $caps['view_give_payments'] )
+		! isset( $caps['view_give_payments'] ) &&
+		! $are_user_roles_cleaned
 	) {
 		give_v1817_process_cleanup_user_roles();
+
+		// Update Option, if the upgrade routine is pending and the user roles are cleaned.
+		give_update_option( '_give_bc_1817_user_roles_cleaned', true );
+	} else if ( $are_user_roles_cleaned && give_has_upgrade_completed( 'v1817_cleanup_user_roles' ) ) {
+
+		// Delete Option, if the upgrade routine is completed and the user roles are cleaned.
+		give_delete_option( '_give_bc_1817_user_roles_cleaned' );
 	}
 
 	return $caps;
