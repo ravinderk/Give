@@ -45,7 +45,7 @@ function give_sync_form_data_with_donation( $post_ID, $post_after, $post_before 
 		return;
 	}
 
-	$payments = new Give_Payments_Query( array( 'give_forms' => $post_ID, 'number' => - 1, 'fields' => 'ids' ) );
+	$payments = new Give_Payments_Query( array( 'give_forms' => $post_ID, 'number' => - 1 ) );
 	$payments = $payments->get_payments();
 
 	// Bailout.
