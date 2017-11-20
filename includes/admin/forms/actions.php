@@ -38,7 +38,7 @@ function give_sync_form_data_with_donation( $post_ID, $post_after, $post_before 
 
 	$changed_vars = array_diff( $post_after, $post_before );
 
-	// unset( $changed_vars['post_modified'], $changed_vars['post_modified_gmt'] );
+	unset( $changed_vars['post_modified'], $changed_vars['post_modified_gmt'] );
 
 	// Bailout.
 	if ( empty( $changed_vars ) ) {
