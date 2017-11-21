@@ -22,6 +22,7 @@ before_script:
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
   - bash tests/bin/install.sh give_test root '' localhost $WP_VERSION
   - bash tests/bin/travis.sh before
+  - phpenv config-rm xdebug.ini
 
 script:
   - phpunit -c phpunit.xml
