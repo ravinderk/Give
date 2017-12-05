@@ -409,7 +409,10 @@ function give_process_profile_editor_updates( $data ) {
 		'user_pass'    => $password,
 	);
 
-	if( empty( $line1 ) || empty( $city ) || empty( $state ) || empty( $zip ) || empty( $country ) ) {
+	if(
+		( empty( $password ) && empty( $confirm_password ) ) &&
+		( empty( $line1 ) || empty( $city ) || empty( $state ) || empty( $zip ) || empty( $country ) )
+	) {
 		give_set_error( 'give-empty-address-fields', __( 'Please fill in the required address fields.', 'give' ) );
 	}
 
@@ -433,7 +436,10 @@ function give_process_profile_editor_updates( $data ) {
 	do_action( 'give_pre_update_user_profile', $user_id, $userdata );
 
 	// Validate First Name.
-	if( empty( $first_name ) ) {
+	if(
+		empty( $first_name ) &&
+		( empty( $password ) && empty( $confirm_password ) )
+	) {
 		give_set_error( 'give-empty-first-name', __( 'Please enter first name.', 'give' ) );
 	}
 
