@@ -2023,7 +2023,7 @@ function give_v20_rename_donor_tables_callback() {
 			$wpdb->query( $wpdb->prepare( "SHOW TABLES LIKE %s", $old_table ) ) &&
 			! $wpdb->query( $wpdb->prepare( "SHOW TABLES LIKE %s", $new_table ) )
 		) {
-			$wpdb->query( "ALTER TABLE {$old_table} RENAME TO {$new_table}" );
+			$wpdb->query( "CREATE TABLE {$new_table} SELECT * FROM {$old_table}" );
 
 			if ( "{$wpdb->prefix}give_donormeta" === $new_table ) {
 				$wpdb->query( "ALTER TABLE {$new_table} CHANGE COLUMN customer_id donor_id bigint(20)" );
