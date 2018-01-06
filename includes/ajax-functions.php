@@ -24,6 +24,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return bool True if AJAX works, false otherwise
  */
 function give_test_ajax_works() {
+	// Handle ajax query.
+	if( wp_doing_ajax() ) {
+		if( isset( $_GET['action'] ) && 'give_test_ajax' === $_GET['action'] ) {
+			wp_send_json_success();
+		}
+
+		wp_die( 0, 400 );
+	}
 
 	// Check if the Airplane Mode plugin is installed.
 	if ( class_exists( 'Airplane_Mode_Core' ) ) {
@@ -51,13 +59,18 @@ function give_test_ajax_works() {
 
 	$params = array(
 		'sslverify' => false,
-		'timeout'   => 30,
-		'body'      => array(
-			'action' => 'give_test_ajax',
-		),
+		'timeout'   => 30
 	);
 
-	$ajax = wp_remote_post( give_get_ajax_url(), $params );
+	$ajax = wp_remote_post(
+		give_get_ajax_url(
+			array(
+				'action' => 'give_test_ajax',
+				'nonce'  => wp_create_nonce( 'give_test_ajax' ),
+			)
+		),
+		$params
+	);
 
 	$works = true;
 
@@ -91,15 +104,18 @@ function give_test_ajax_works() {
 	return $works;
 }
 
+add_action( 'wp_ajax_nopriv_give_test_ajax', 'give_test_ajax_works' );
 
 /**
  * Get AJAX URL
  *
  * @since  1.0
  *
+ * @param array $query
+ *
  * @return string
  */
-function give_get_ajax_url() {
+function give_get_ajax_url( $query = array() ) {
 	$scheme = defined( 'FORCE_SSL_ADMIN' ) && FORCE_SSL_ADMIN ? 'https' : 'admin';
 
 	$current_url = give_get_current_page_url();
@@ -107,6 +123,10 @@ function give_get_ajax_url() {
 
 	if ( preg_match( '/^https/', $current_url ) && ! preg_match( '/^https/', $ajax_url ) ) {
 		$ajax_url = preg_replace( '/^http/', 'https', $ajax_url );
+	}
+
+	if( ! empty( $query ) ) {
+		$ajax_url = add_query_arg( $query, $ajax_url );
 	}
 
 	return apply_filters( 'give_ajax_url', $ajax_url );
