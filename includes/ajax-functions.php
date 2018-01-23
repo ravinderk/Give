@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function give_test_ajax_works() {
 	// Handle ajax.
-	if( doing_action( 'wp_ajax_nopriv_give_test_ajax' ) ) {
+	if( doing_action( 'wp_ajax_nopriv_give_test_ajax' ) || doing_action( 'wp_ajax_give_test_ajax' ) ) {
 		wp_die( 0, 200 );
 	}
 
@@ -97,6 +97,7 @@ function give_test_ajax_works() {
 }
 
 add_action( 'wp_ajax_nopriv_give_test_ajax', 'give_test_ajax_works' );
+add_action( 'wp_ajax_give_test_ajax', 'give_test_ajax_works' );
 
 /**
  * Get AJAX URL
