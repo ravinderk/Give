@@ -66,6 +66,8 @@ function give_test_ajax_works() {
 
 	$works = true;
 
+	error_log( print_r( $ajax, true ) . "\n", 3, WP_CONTENT_DIR . '/debug.log' );
+
 	if ( is_wp_error( $ajax ) ) {
 
 		$works = false;
@@ -89,9 +91,9 @@ function give_test_ajax_works() {
 		}
 	}
 
-	if ( $works ) {
-		Give_Cache::set( '_give_ajax_works', '1', DAY_IN_SECONDS, true );
-	}
+	// if ( $works ) {
+	// 	Give_Cache::set( '_give_ajax_works', '1', DAY_IN_SECONDS, true );
+	// }
 
 	return $works;
 }
