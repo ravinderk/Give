@@ -78,8 +78,11 @@ function give_test_ajax_works() {
 			$works = false;
 		}
 
-		if ( empty( $ajax['response']['code'] ) || 200 !== (int) $ajax['response']['code'] ) {
-			$works = false;
+		if ( empty( $ajax['response']['code'] ) ) {
+
+			if( ( 200 !== (int) $ajax['response']['code'] ) || ( 401 !== (int) $ajax['response']['code'] ) ) {
+				$works = false;
+			}
 		}
 
 		if ( empty( $ajax['response']['message'] ) || 'OK' !== $ajax['response']['message'] ) {
