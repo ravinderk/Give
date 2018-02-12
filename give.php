@@ -239,6 +239,9 @@ if ( ! class_exists( 'Give' ) ) :
 		public static function instance() {
 			if ( is_null( self::$_instance ) ) {
 				self::$_instance = new self();
+
+				register_activation_hook( GIVE_PLUGIN_FILE, 'give_install' );
+				self::$_instance->init();
 			}
 
 			return self::$_instance;
@@ -263,19 +266,8 @@ if ( ! class_exists( 'Give' ) ) :
 			$this->setup_constants();
 
 			$this->includes();
-			$this->init_hooks();
 
 			do_action( 'give_loaded' );
-		}
-
-		/**
-		 * Hook into actions and filters.
-		 *
-		 * @since  1.8.9
-		 */
-		private function init_hooks() {
-			register_activation_hook( GIVE_PLUGIN_FILE, 'give_install' );
-			add_action( 'plugins_loaded', array( $this, 'init' ), 0 );
 		}
 
 		/**
