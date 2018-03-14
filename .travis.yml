@@ -19,7 +19,7 @@ matrix:
     dist: precise
 
 before_script:
-  - echo '{"name": "give",}' > package.json
+  - echo '{"name": "give"}' > package.json
   - phpenv config-rm xdebug.ini
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
   - bash tests/bin/install.sh give_test root '' localhost $WP_VERSION
