@@ -23,6 +23,29 @@
 
 import 'magnific-popup';
 
+/**
+ * # All popups are an instance of GiveModal class
+ *
+ * # The minimum syntax required to instantiate a popup
+ * depending on the source are of 2 types:
+ *
+ * # `new GiveModal()` should be the first method and `popup()` should be the last method.
+ *
+ * -- 1. From an HTML entity:
+ *    `new GiveModal( '#test-popup' ).popup()`
+ *
+ * -- 2. Dynamically generated content:
+ *    `new GiveModal().customContent({ title: 'Some title', content: 'Some Content' }).popup()`
+ *
+ * # Set the type of popup by chaining one of the following suitable methods:
+ * -- 1. success()
+ * -- 2. notice()
+ * -- 3. warning()
+ * -- 4. error()
+ *
+ * # Chain the `addButton()` to add more buttons to the popup
+ */
+
 const GiveModal = ( function( $ ) {
 
 	/**
@@ -95,6 +118,25 @@ const GiveModal = ( function( $ ) {
 
 
 	/**
+	 * Merge 2 objects.
+	 *
+	 * @param object obj1 First Object.
+	 * @param object obj2 Second Object.
+	 */
+	GiveModal.prototype.extend = function( obj1, obj2 ) {
+		let property;
+
+		for ( property in obj2 ) {
+			if ( obj2.hasOwnProperty( property ) ) {
+				obj1[ property ] = obj2[ property ];
+			}
+		}
+
+		return obj1;
+	}
+
+
+	/**
 	 * Adds necessary classes for an error popup.
 	 */
 	GiveModal.prototype.error = function() {
@@ -164,7 +206,7 @@ const GiveModal = ( function( $ ) {
 	 */
 	GiveModal.prototype.customContent = function( popupData = {} ) {
 		let title   = !! popupData.title && `<h2>${ popupData.title }</h2>`,
-		    content = !! popupData.content && popupData.content;
+			content = !! popupData.content && popupData.content;
 		this.config.items.src = `<div class="white-popup zoom-animation">${ !! title ? title : '' }${ !! content ? content : '' }</div>`;
 
 		return this;
@@ -214,7 +256,7 @@ const GiveModal = ( function( $ ) {
 
 
 		// Configuration object for 'notice' Magnific Popup.
-		$.extend( this.config, {
+		this.extend( this.config, {
 			showCloseBtn: false,
 			callbacks: {
 
@@ -227,12 +269,13 @@ const GiveModal = ( function( $ ) {
 					// Reference to MagnificPopup object.
 					reference.callback = this;
 
-					// Reference to $( '.white-popup' )
-					reference.callback.content = $( this.content );
+					// Reference to '.white-popup'
+					reference.callback.whitePopup = this.content;
 
-					let html = reference.callback.content.html();
-					reference.callback.content.html( '' );
-					reference.callback.content.append( `<div class="white-popup-child-container">${ html }</div>` );
+					let html = reference.callback.whitePopup[0].innerHTML;
+
+					reference.callback.whitePopup[0].innerHTML = '';
+					reference.callback.whitePopup[0].innerHTML += `<div class="white-popup-child-container">${ html }</div>`;
 
 					let cancelTextNode = reference.root.applyFilter( 'cancel_text_node', 'Close' );
 
@@ -243,15 +286,17 @@ const GiveModal = ( function( $ ) {
 					fields += '</div>';
 
 					// Appends the control buttons after the popup content.
-					reference.callback.content.append( fields );
+					reference.callback.whitePopup[0].innerHTML += fields;
 				},
-
 
 				/**
 				 * Callback fires after closing the popup.
 				 */
 				close: function() {
-					reference.callback.content.find( '.give-appended-controls' ).remove();
+					let gendoc   = new DOMParser().parseFromString( reference.callback.whitePopup[0].innerHTML, 'text/html' ),
+					    controls = gendoc.body.querySelectorAll( '.give-appended-controls' )[0];
+
+					controls.parentNode.removeChild( controls );
 					reference.root.filter.filter_obj = {};
 				},
 			}
@@ -266,9 +311,11 @@ const GiveModal = ( function( $ ) {
 		 * Event handler to close the popup after
 		 * clicking the close button.
 		 */
-		this.doc.on( 'click', '#give-popup-close-button', function() {
-			reference.root.close();
-		})
+		document.addEventListener( 'click', function( e ) {
+			if ( 'give-popup-close-button' === e.target.id ) {
+				reference.root.close();
+			}
+		});
 
 		return this;
 	}
