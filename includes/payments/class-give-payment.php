@@ -325,6 +325,16 @@ final class Give_Payment {
 	protected $address = array();
 
 	/**
+	 * The company name used for the payment if provided
+	 *
+	 * @since  2.1.0
+	 * @access protected
+	 *
+	 * @var    array
+	 */
+	protected $company = '';
+
+	/**
 	 * The transaction ID returned by the gateway
 	 *
 	 * @since  1.5
@@ -556,6 +566,7 @@ final class Give_Payment {
 			$this->email       = $this->setup_email();
 			$this->user_info   = $this->setup_user_info();
 			$this->address     = $this->setup_address();
+			$this->company     = $this->setup_company();
 			$this->first_name  = $this->user_info['first_name'];
 			$this->last_name   = $this->user_info['last_name'];
 
@@ -1772,6 +1783,18 @@ final class Give_Payment {
 		$address['country'] = give_get_meta( $this->ID, '_give_donor_billing_country', true, '' );
 
 		return $address;
+	}
+
+	/**
+	 * Setup the company name for the payment.
+	 *
+	 * @since 2.1.0
+	 * @access private
+	 *
+	 * @return string
+	 */
+	private function setup_company(){
+		return (string)  $this->get_meta('_give_donation_company' );
 	}
 
 	/**
