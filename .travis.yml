@@ -29,3 +29,8 @@ script:
 
 after_script:
   - bash tests/bin/travis.sh after
+
+after_success:
+    - travis_retry php vendor/bin/php-coveralls
+    # or enable logging
+    - travis_retry php vendor/bin/php-coveralls -v
