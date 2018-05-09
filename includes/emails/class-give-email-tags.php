@@ -714,9 +714,9 @@ function give_email_tag_billing_address( $tag_args ) {
  *
  * Date of donation
  *
- * @param array $tag_args
+ * @param array $tag_args Arguments which helps to decode email template tags.
  *
- * @return string date
+ * @return string $date Post Date.
  */
 function give_email_tag_date( $tag_args ) {
 	$date = '';
@@ -726,7 +726,7 @@ function give_email_tag_date( $tag_args ) {
 
 	switch ( true ) {
 		case give_check_variable( $tag_args, 'isset', 0, 'payment_id' ):
-			$date = date_i18n( give_date_format(), strtotime( get_the_date( $tag_args['payment_id'] ) ) );
+			$date = date_i18n( give_date_format(), get_the_date( 'U', $tag_args['payment_id'] ) );
 			break;
 	}
 
@@ -736,7 +736,7 @@ function give_email_tag_date( $tag_args ) {
 	 * @since 2.0
 	 *
 	 * @param string $date
-	 * @param array  $tag_args
+	 * @param array $tag_args
 	 */
 	$date = apply_filters( 'give_email_tag_date', $date, $tag_args );
 
@@ -1222,6 +1222,11 @@ function give_email_tag_email_access_link( $tag_args ) {
 
 		// Generate a new verify key
 		Give()->email_access->set_verify_key( $donor_id, $donor->email, $verify_key );
+		// update verify key in email tags.
+		$tag_args['verify_key'] = $verify_key;
+
+		// update donor id in email tags.
+		$tag_args['donor_id'] = $donor_id;
 
 		$access_url = add_query_arg(
 			array(
