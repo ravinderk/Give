@@ -768,6 +768,8 @@ add_action( 'give_register_fields_before', 'give_user_info_fields' );
  * @return void
  */
 function give_get_cc_form( $form_id ) {
+	$uniqid = uniqid();
+	$id_prefix = "{$form_id}-{$uniqid}";
 
 	ob_start();
 
@@ -780,47 +782,47 @@ function give_get_cc_form( $form_id ) {
 	 */
 	do_action( 'give_before_cc_fields', $form_id );
 	?>
-	<fieldset id="give_cc_fields-<?php echo $form_id ?>" class="give-do-validate">
+	<fieldset id="give_cc_fields-<?php echo $id_prefix ?>" class="give-do-validate">
 		<legend><?php echo apply_filters( 'give_credit_card_fieldset_heading', esc_html__( 'Credit Card Info', 'give' ) ); ?></legend>
 		<?php if ( is_ssl() ) : ?>
-			<div id="give_secure_site_wrapper-<?php echo $form_id ?>">
+			<div id="give_secure_site_wrapper-<?php echo $id_prefix ?>">
 				<span class="give-icon padlock"></span>
 				<span><?php _e( 'This is a secure SSL encrypted payment.', 'give' ); ?></span>
 			</div>
 		<?php endif; ?>
-		<p id="give-card-number-wrap-<?php echo $form_id ?>" class="form-row form-row-two-thirds form-row-responsive">
-			<label for="card_number-<?php echo $form_id ?>" class="give-label">
+		<p id="give-card-number-wrap-<?php echo $id_prefix ?>" class="form-row form-row-two-thirds form-row-responsive">
+			<label for="card_number-<?php echo $id_prefix ?>" class="give-label">
 				<?php _e( 'Card Number', 'give' ); ?>
 				<span class="give-required-indicator">*</span>
 				<?php echo Give()->tooltips->render_help( __( 'The (typically) 16 digits on the front of your credit card.', 'give' ) ); ?>
 				<span class="card-type"></span>
 			</label>
 
-			<input type="tel" autocomplete="off" name="card_number" id="card_number-<?php echo $form_id ?>"
+			<input type="tel" autocomplete="off" name="card_number" id="card_number-<?php echo $id_prefix ?>"
 				   class="card-number give-input required" placeholder="<?php _e( 'Card number', 'give' ); ?>"
 				   required aria-required="true"/>
 		</p>
 
-		<p id="give-card-cvc-wrap-<?php echo $form_id ?>" class="form-row form-row-one-third form-row-responsive">
-			<label for="card_cvc-<?php echo $form_id ?>" class="give-label">
+		<p id="give-card-cvc-wrap-<?php echo $id_prefix ?>" class="form-row form-row-one-third form-row-responsive">
+			<label for="card_cvc-<?php echo $id_prefix ?>" class="give-label">
 				<?php _e( 'CVC', 'give' ); ?>
 				<span class="give-required-indicator">*</span>
 				<?php echo Give()->tooltips->render_help( __( 'The 3 digit (back) or 4 digit (front) value on your card.', 'give' ) ); ?>
 			</label>
 
-			<input type="tel" size="4" autocomplete="off" name="card_cvc" id="card_cvc-<?php echo $form_id ?>"
+			<input type="tel" size="4" autocomplete="off" name="card_cvc" id="card_cvc-<?php echo $id_prefix ?>"
 				   class="card-cvc give-input required" placeholder="<?php _e( 'Security code', 'give' ); ?>"
 				   required aria-required="true"/>
 		</p>
 
-		<p id="give-card-name-wrap-<?php echo $form_id ?>" class="form-row form-row-two-thirds form-row-responsive">
-			<label for="card_name-<?php echo $form_id ?>" class="give-label">
+		<p id="give-card-name-wrap-<?php echo $id_prefix ?>" class="form-row form-row-two-thirds form-row-responsive">
+			<label for="card_name-<?php echo $id_prefix ?>" class="give-label">
 				<?php _e( 'Name on the Card', 'give' ); ?>
 				<span class="give-required-indicator">*</span>
 				<?php echo Give()->tooltips->render_help( __( 'The name printed on the front of your credit card.', 'give' ) ); ?>
 			</label>
 
-			<input type="text" autocomplete="off" name="card_name" id="card_name-<?php echo $form_id ?>"
+			<input type="text" autocomplete="off" name="card_name" id="card_name-<?php echo $id_prefix ?>"
 				   class="card-name give-input required" placeholder="<?php esc_attr_e( 'Card name', 'give' ); ?>"
 				   required aria-required="true"/>
 		</p>
@@ -835,16 +837,16 @@ function give_get_cc_form( $form_id ) {
 		do_action( 'give_before_cc_expiration' );
 		?>
 		<p class="card-expiration form-row form-row-one-third form-row-responsive">
-			<label for="card_expiry-<?php echo $form_id ?>" class="give-label">
+			<label for="card_expiry-<?php echo $id_prefix ?>" class="give-label">
 				<?php _e( 'Expiration', 'give' ); ?>
 				<span class="give-required-indicator">*</span>
 				<?php echo Give()->tooltips->render_help( __( 'The date your credit card expires, typically on the front of the card.', 'give' ) ); ?>
 			</label>
 
-			<input type="hidden" id="card_exp_month-<?php echo $form_id ?>" name="card_exp_month" class="card-expiry-month"/>
-			<input type="hidden" id="card_exp_year-<?php echo $form_id ?>" name="card_exp_year" class="card-expiry-year"/>
+			<input type="hidden" id="card_exp_month-<?php echo $id_prefix ?>" name="card_exp_month" class="card-expiry-month"/>
+			<input type="hidden" id="card_exp_year-<?php echo $id_prefix ?>" name="card_exp_year" class="card-expiry-year"/>
 
-			<input type="tel" autocomplete="off" name="card_expiry" id="card_expiry-<?php echo $form_id ?>" class="card-expiry give-input required" placeholder="<?php esc_attr_e( 'MM / YY', 'give' ); ?>" required aria-required="true"/>
+			<input type="tel" autocomplete="off" name="card_expiry" id="card_expiry-<?php echo $id_prefix ?>" class="card-expiry give-input required" placeholder="<?php esc_attr_e( 'MM / YY', 'give' ); ?>" required aria-required="true"/>
 		</p>
 		<?php
 		/**
