@@ -124,7 +124,7 @@ function give_get_donation_form( $args = array() ) {
 
 			// Set form html tags.
 			$form_html_tags = array(
-				'id'     => "give-form-{$form_id}-" . uniqid(),
+				'id'     => "give-form-{$form_id}",
 				'class'  => $form_classes,
 				'action' => esc_url_raw( $form_action ),
 			);
