@@ -65,7 +65,20 @@
 				margin-bottom: 1rem;
 
 				li {
+					position: relative;
+					margin-bottom: .70rem;
 					padding: 0 1rem;
+
+					label {
+						display: block;
+						padding-left: 22px;
+
+						input {
+							position: absolute;
+							top: 6px;
+							left: 15px;
+						}
+					}
 				}
 
 				.give-export-option-label {
