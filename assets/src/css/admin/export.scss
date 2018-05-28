@@ -147,3 +147,17 @@
 		width: 49.5%;
 	}
 }
+
+@media only screen and ( max-width: 782px ) {
+	.give-tools-setting-page #give-export_donations-form .give-export-option > li {
+		width: 49.5%;
+	}
+
+	.give-tools-setting-page #give-export_donations-form .give-export-option ul li label {
+		padding-left: 32px;
+	}
+
+	.give-tools-setting-page #give-export_donations-form .give-export-option ul li label input {
+		top: 0;
+	}
+}
