@@ -78,7 +78,11 @@ class Give_Stats {
 	 * @return void
 	 */
 	public function __construct() {
-		/* nothing here. Call get_sales() and get_earnings() directly */
+		$predefined_dates = $this->get_predefined_dates();
+
+		foreach ( $predefined_dates as $date_code => $label ) {
+			add_action( "give_calculate_{$date_code}_stat", array( $this, '__calculate_stat_handler' ) );
+		}
 	}
 
 	/**
@@ -539,4 +543,95 @@ class Give_Stats {
 		return $where;
 	}
 
+	/**
+	 * Calculate stat for form and donor
+	 *
+	 * @since 2.3.0
+	 * @access public
+	 *
+	 * @param array $args      {
+	 *
+	 * @type string $stat_type Data to check which type of stat developer wants to calculate.
+	 *                          Allowed values: donor or form
+	 * @type int $donation_id
+	 *
+	 * }
+	 *
+	 * @return bool
+	 */
+	public function calculate_stats( $args ) {
+		$allowed_stats_type = array( 'donor', 'form' );
+
+		if (
+			! array_key_exists( 'stat_type', $args )
+			|| ! in_array( $args['stat_type'], $allowed_stats_type )
+			|| ! array_key_exists( 'donation_id', $args )
+			|| ! absint( $args['donation_id'] )
+		) {
+			return false;
+		}
+
+		$action_hook_data = $args;
+		unset( $action_hook_data['stat_type'] );
+
+		$predefined_dates = $this->get_predefined_dates();
+
+		foreach ( $predefined_dates as $date_code => $label ) {
+			// Set date if did not exist.
+			// required and accepted as date code
+			$action_hook_data['date'] = $date_code;
+
+			/**
+			 * Fire the action
+			 *
+			 * @since 2.3.0
+			 */
+			do_action( "give_calculate_{$date_code}_stat", $action_hook_data );
+
+			unset( $action_hook_data['date'] );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Handle calculate stat action
+	 * Note: only for internal use
+	 *
+	 * @since 2.3.0
+	 * @since public
+	 *
+	 * @param array $args List of arguments. defined in depth in calculate_stats function description
+	 */
+	public function __calculate_stat_handler( $args ) {
+		$this->lock_date( $args );
+	}
+
+
+	/**
+	 * Save date to form and donor meta for stat validation
+	 *
+	 * @since  2.3.0
+	 * @access public
+	 *
+	 * @param $args
+	 */
+	public function lock_date( $args ) {
+		$form_id  = give_get_payment_form_id( $args['donation_id'] );
+		$donor_id = give_get_payment_donor_id( $args['donation_id'] );
+
+		$time     = strtotime( 'midnight', $this->convert_date( $args['date'] ) );
+		$time_md5 = md5( (string) $time );
+		$meta_key = "_give_{$time_md5}_stat_date";
+
+		// Store date only if not exist
+
+		if( ! give_get_meta( $form_id, $meta_key, true ) ) {
+			give_update_meta( $form_id, $meta_key, $time );
+		}
+
+		if( Give()->donor_meta->get_meta( $donor_id, $meta_key, true ) ) {
+			Give()->donor_meta->update_meta( $donor_id, $meta_key, $time );
+		}
+	}
 }
