@@ -100,9 +100,7 @@ class Give_Cache_Setting {
 			return;
 		}
 
-
-		$options = apply_filters( 'give_load_plugin_setting_names', self::$options );
-		$options = '\'' . implode( '\',\'', $options ) . '\'';
+		$options = '\'' . implode( '\',\'', self::$options ) . '\'';
 
 		$tmp     = array();
 		$sql     = "SELECT option_name, option_value FROM $wpdb->options WHERE option_name IN ({$options}) ";
