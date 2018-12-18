@@ -81,6 +81,10 @@ class Give_Cache_Setting {
 	 */
 	private function setup() {
 		$this->load_plugin_settings();
+
+		add_action( 'added_option', array( $this, '__reload_plugin_settings' )  );
+		add_action( 'updated_option', array( $this, '__reload_plugin_settings' )  );
+		add_action( 'deleted_option', array( $this, '__reload_plugin_settings' )  );
 	}
 
 	/**
@@ -116,6 +120,24 @@ class Give_Cache_Setting {
 			self::$settings = $tmp;
 			wp_cache_set( 'giveAllOptions', $tmp, 'options' );
 		}
+	}
+
+	/**
+	 * Reload option when add, update or delete
+	 * Note: only for internal logic
+	 *
+	 * @since 2.4.0
+	 *
+	 * @param $option_name
+	 */
+	public function __reload_plugin_settings( $option_name ) {
+		// Bailout.
+		if ( ! in_array( $option_name, self::$options ) ) {
+			return;
+		}
+
+		wp_cache_delete( 'giveAllOptions', 'options' );
+		$this->$this->load_plugin_settings();
 	}
 
 
