@@ -1171,6 +1171,10 @@ class Give_API {
 
 		$dates = $this->get_dates( $args );
 
+		$new_dates = 'range' === $args['date']
+			? $this->date->parse_date_for_range( array( 'start_date' => $args[ 'startdate'], 'end_date' => $args['enddate']  ) )
+			: $this->date->parse_date_for_range( $args['date'] );
+
 		$stats     = array();
 		$earnings  = array(
 			'earnings' => array(),
