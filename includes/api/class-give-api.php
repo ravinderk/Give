@@ -2099,12 +2099,10 @@ class Give_API {
 	 */
 	private function get_default_sales_stats() {
 
-		// Default sales return
-		$donations                               = array();
-		$donations['donations']['today']         = $this->stats->get_sales( 0, 'today' );
-		$donations['donations']['current_month'] = $this->stats->get_sales( 0, 'this_month' );
-		$donations['donations']['last_month']    = $this->stats->get_sales( 0, 'last_month' );
-		$donations['donations']['totals']        = give_get_total_donations();
+		$donations['donations']['today']         = $this->donation_stats->get_sales( array( 'range' => 'today' ) )->sales;
+		$donations['donations']['current_month'] = $this->donation_stats->get_sales( array( 'range' => 'this_month' ) )->sales;
+		$donations['donations']['last_month']    = $this->donation_stats->get_sales( array( 'range' => 'last_month' ) )->sales;
+		$donations['donations']['totals']        = $this->donation_stats->get_sales()->sales;
 
 		return $donations;
 	}
@@ -2118,12 +2116,10 @@ class Give_API {
 	 */
 	private function get_default_earnings_stats() {
 
-		// Default earnings return
-		$earnings                              = array();
-		$earnings['earnings']['today']         = $this->stats->get_earnings( 0, 'today' );
-		$earnings['earnings']['current_month'] = $this->stats->get_earnings( 0, 'this_month' );
-		$earnings['earnings']['last_month']    = $this->stats->get_earnings( 0, 'last_month' );
-		$earnings['earnings']['totals']        = give_get_total_earnings();
+		$earnings['earnings']['today']         = $this->donation_stats->get_earnings( array( 'range' => 'today' ) )->total;
+		$earnings['earnings']['current_month'] = $this->donation_stats->get_earnings( array( 'range' => 'this_month' ) )->total;
+		$earnings['earnings']['last_month']    = $this->donation_stats->get_earnings( array( 'range' => 'last_month' ) )->total;
+		$earnings['earnings']['totals']        = $this->donation_stats->get_earnings()->total;
 
 		return $earnings;
 	}
