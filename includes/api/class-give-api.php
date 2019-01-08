@@ -130,6 +130,24 @@ class Give_API {
 	private $routes;
 
 	/**
+	 * Object
+	 *
+	 * @var Give_Donation_Stats
+	 * @access private
+	 * @since  2.4.1
+	 */
+	private $donation_stats;
+
+	/**
+	 * Object
+	 *
+	 * @var Give_Date
+	 * @access private
+	 * @since  2.4.1
+	 */
+	private $date;
+
+	/**
 	 * Setup the Give API
 	 *
 	 * @since  1.1
@@ -165,6 +183,9 @@ class Give_API {
 
 		// Setup Give_Payment_Stats instance
 		$this->stats = new Give_Payment_Stats();
+
+		$this->donation_stats = new Give_Donation_Stats();
+		$this->date = new Give_Date();
 
 	}
 
