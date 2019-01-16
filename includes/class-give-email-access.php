@@ -104,9 +104,12 @@ class Give_Email_Access {
 	 * @access public
 	 */
 	public function __construct() {
-
 		// Get it started.
 		add_action( 'wp', array( $this, 'setup' ) );
+
+		if( wp_doing_ajax() && (bool) $this->get_token() ) {
+			add_action( 'give_init', array( $this, 'init' ), 999 );
+		}
 	}
 
 	/**
@@ -210,6 +213,25 @@ class Give_Email_Access {
 	}
 
 	/**
+	 * Get token
+	 *
+	 * @since 2.4.0
+	 * @access private
+	 *
+	 * @return string
+	 */
+	private function get_token(){
+		$token = isset( $_GET['give_nl'] ) ? give_clean( $_GET['give_nl'] ) : '';
+
+		// Check for cookie.
+		if ( empty( $token ) ) {
+			$token = isset( $_COOKIE['give_nl'] ) ? give_clean( $_COOKIE['give_nl'] ) : '';
+		}
+
+		return $token;
+	}
+
+	/**
 	 * Has the user authenticated?
 	 *
 	 * @since  1.0
@@ -219,12 +241,7 @@ class Give_Email_Access {
 	 */
 	public function check_for_token() {
 
-		$token = isset( $_GET['give_nl'] ) ? give_clean( $_GET['give_nl'] ) : '';
-
-		// Check for cookie.
-		if ( empty( $token ) ) {
-			$token = isset( $_COOKIE['give_nl'] ) ? give_clean( $_COOKIE['give_nl'] ) : '';
-		}
+		$token = $this->get_token();
 
 		// Must have a token.
 		if ( ! empty( $token ) ) {
