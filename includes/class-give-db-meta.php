@@ -16,6 +16,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Give_DB_Meta extends Give_DB {
 	/**
+	 * Static Instance
+	 * @var Give_DB_Meta|null
+	 */
+	private static $instance = null;
+
+	/**
 	 * Post type
 	 *
 	 * @since  2.0
@@ -71,45 +77,99 @@ class Give_DB_Meta extends Give_DB {
 	/**
 	 * Give_DB_Meta constructor.
 	 *
+	 * Note: It is public for backward compatibility and use get_instance instead.
+	 *       In future the constructor will private to prevent multiple initiation.
+	 *
 	 * @since 2.0
 	 */
 	function __construct() {
-		parent::__construct();
+		$this->setup_hooks();
+	}
+
+	/**
+	 * Get instance
+	 *
+	 * @since 2.5.0
+	 */
+	public static function get_instance(){
+		if( null === self::$instance ){
+			self::$instance = new static();
+
+			self::$instance->setup_hooks();
+		}
+
+		return self::$instance;
+	}
+
+
+	/**
+	 * Setup hooks
+	 *
+	 * @since 2.5.0
+	 */
+	private function setup_hooks(){
+		if( is_multisite() ) {
+			add_action( 'switch_blog', array( $this, 'handle_switch_blog' ), 10, 2 );
+		}
 
 		// Bailout.
 		if ( empty( $this->supports ) || ! $this->is_custom_meta_table_active() ) {
 			return;
 		}
 
-		if ( in_array( 'add_post_metadata', $this->supports ) ) {
+		if (
+			in_array( 'add_post_metadata', $this->supports )
+			&& ! has_filter( 'add_post_metadata', array( $this, '__add_meta' ) )
+		) {
 			add_filter( 'add_post_metadata', array( $this, '__add_meta' ), 0, 5 );
 		}
 
-		if ( in_array( 'get_post_metadata', $this->supports ) ) {
+		if (
+			in_array( 'get_post_metadata', $this->supports )
+			&& ! has_filter( 'get_post_metadata', array( $this, '__get_meta' ) )
+		) {
 			add_filter( 'get_post_metadata', array( $this, '__get_meta' ), 10, 4 );
 		}
 
-		if ( in_array( 'update_post_metadata', $this->supports ) ) {
+		if (
+			in_array( 'update_post_metadata', $this->supports )
+			&& ! has_filter( 'update_post_metadata', array( $this, '__update_meta' ) )
+		) {
 			add_filter( 'update_post_metadata', array( $this, '__update_meta' ), 0, 5 );
 		}
 
-		if ( in_array( 'delete_post_metadata', $this->supports ) ) {
+		if (
+			in_array( 'delete_post_metadata', $this->supports )
+			&& ! has_filter( 'delete_post_metadata', array( $this, '__delete_meta' ) )
+		) {
 			add_filter( 'delete_post_metadata', array( $this, '__delete_meta' ), 0, 5 );
 		}
 
-		if ( in_array( 'posts_where', $this->supports ) ) {
+		if (
+			in_array( 'posts_where', $this->supports )
+			&& ! has_filter( 'posts_where', array( $this, '__rename_meta_table_name_in_query' ) )
+		) {
 			add_filter( 'posts_where', array( $this, '__rename_meta_table_name_in_query' ), 99999, 2 );
 		}
 
-		if ( in_array( 'posts_join', $this->supports ) ) {
+		if (
+			in_array( 'posts_join', $this->supports )
+			&& ! has_filter( 'posts_join', array( $this, '__rename_meta_table_name_in_query' ) )
+		) {
 			add_filter( 'posts_join', array( $this, '__rename_meta_table_name_in_query' ), 99999, 2 );
 		}
 
-		if ( in_array( 'posts_groupby', $this->supports ) ) {
+		if (
+			in_array( 'posts_groupby', $this->supports )
+			&& ! has_filter( 'posts_groupby', array( $this, '__rename_meta_table_name_in_query' ) )
+		) {
 			add_filter( 'posts_groupby', array( $this, '__rename_meta_table_name_in_query' ), 99999, 2 );
 		}
 
-		if ( in_array( 'posts_orderby', $this->supports ) ) {
+		if (
+			in_array( 'posts_orderby', $this->supports )
+			&& ! has_filter( 'posts_orderby', array( $this, '__rename_meta_table_name_in_query' ) )
+		) {
 			add_filter( 'posts_orderby', array( $this, '__rename_meta_table_name_in_query' ), 99999, 2 );
 		}
 	}

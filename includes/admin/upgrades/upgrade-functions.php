@@ -26,10 +26,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 function give_do_automatic_upgrades() {
 	$did_upgrade  = false;
 	$give_version = preg_replace( '/[^0-9.].*/', '', get_option( 'give_version' ) );
+	$is_fresh_install = ! $give_version;
 
 	if ( ! $give_version ) {
 		// 1.0 is the first version to use this option so we must add it.
-		$give_version = '1.0';
+		$give_version = GIVE_VERSION;
 	}
 
 	switch ( true ) {
@@ -132,7 +133,11 @@ function give_do_automatic_upgrades() {
 			$did_upgrade = true;
 	}
 
-	if ( $did_upgrade || version_compare( $give_version, GIVE_VERSION, '<' ) ) {
+	if (
+		$did_upgrade
+		|| $is_fresh_install
+		|| version_compare( $give_version, GIVE_VERSION, '<' )
+	) {
 		update_option( 'give_version', preg_replace( '/[^0-9.].*/', '', GIVE_VERSION ), false );
 	}
 }

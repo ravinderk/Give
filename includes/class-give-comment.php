@@ -80,7 +80,7 @@ class Give_Comment {
 	 */
 	private function init() {
 		$this->db      = new Give_DB_Comments();
-		$this->db_meta = new Give_DB_Comment_Meta();
+		$this->db_meta = Give_DB_Comment_Meta::get_instance();
 
 		/**
 		 * Filter the comment type

@@ -79,38 +79,7 @@ function give_run_install() {
 	// Populate the default values.
 	update_option( 'give_settings', array_merge( $give_options, $options ), false );
 
-	/**
-	 * Run plugin upgrades.
-	 *
-	 * @since 1.8
-	 */
-	do_action( 'give_upgrades' );
-
-	if ( GIVE_VERSION !== get_option( 'give_version' ) ) {
-		update_option( 'give_version', GIVE_VERSION, false );
-	}
-
-	// Create Give roles.
-	$roles = new Give_Roles();
-	$roles->add_roles();
-	$roles->add_caps();
-
-	// Set api version, end point and refresh permalink.
-	$api = new Give_API();
-	$api->add_endpoint();
-	update_option( 'give_default_api_version', 'v' . $api->get_version(), false );
-
-	flush_rewrite_rules();
-
-	// Create databases.
-	__give_register_tables();
-
-	// Add a temporary option to note that Give pages have been created.
-	Give_Cache::set( '_give_installed', $options, 30, true );
-
 	if ( ! $current_version ) {
-
-		require_once GIVE_PLUGIN_DIR . 'includes/admin/upgrades/upgrade-functions.php';
 
 		// When new upgrade routines are added, mark them as complete on fresh install.
 		$upgrade_routines = array(
@@ -157,6 +126,29 @@ function give_run_install() {
 			give_set_upgrade_complete( $upgrade );
 		}
 	}
+
+
+	/**
+	 * Run plugin upgrades.
+	 *
+	 * @since 1.8
+	 */
+	do_action( 'give_upgrades' );
+
+	// Create Give roles.
+	$roles = new Give_Roles();
+	$roles->add_roles();
+	$roles->add_caps();
+
+	// Set api version, end point and refresh permalink.
+	$api = new Give_API();
+	$api->add_endpoint();
+	update_option( 'give_default_api_version', 'v' . $api->get_version(), false );
+
+	flush_rewrite_rules();
+
+	// Add a temporary option to note that Give pages have been created.
+	Give_Cache::set( '_give_installed', $options, 30, true );
 
 	// Bail if activating from network, or bulk.
 	if ( is_network_admin() || isset( $_GET['activate-multi'] ) ) {
@@ -496,12 +488,16 @@ add_action( 'admin_init', 'give_create_pages', - 1 );
  * @param string $old_version
  */
 function give_install_tables_on_plugin_update( $old_version ) {
+	if( 'add_option_give_version' === current_action() ){
+		$old_version = GIVE_VERSION;
+	}
+
 	update_option( 'give_version_upgraded_from', $old_version, false );
 	__give_register_tables();
 }
 
 add_action( 'update_option_give_version', 'give_install_tables_on_plugin_update', 0, 2 );
-
+add_action( 'add_option_give_version', 'give_install_tables_on_plugin_update', 0, 2 );
 
 /**
  * Get array of table class objects
@@ -514,15 +510,15 @@ add_action( 'update_option_give_version', 'give_install_tables_on_plugin_update'
 function __give_get_tables() {
 	$tables = array(
 		'donors_db'       => new Give_DB_Donors(),
-		'donor_meta_db'   => new Give_DB_Donor_Meta(),
+		'donor_meta_db'   => Give_DB_Donor_Meta::get_instance(),
 		'comment_db'      => new Give_DB_Comments(),
-		'comment_db_meta' => new Give_DB_Comment_Meta(),
+		'comment_db_meta' => Give_DB_Comment_Meta::get_instance(),
 		'give_session'    => new Give_DB_Sessions(),
 		'log_db'          => new Give_DB_Logs(),
-		'logmeta_db'      => new Give_DB_Log_Meta(),
-		'formmeta_db'     => new Give_DB_Form_Meta(),
+		'logmeta_db'      => Give_DB_Log_Meta::get_instance(),
+		'formmeta_db'     => Give_DB_Form_Meta::get_instance(),
 		'sequential_db'   => new Give_DB_Sequential_Ordering(),
-		'donation_meta'   => new Give_DB_Payment_Meta(),
+		'donation_meta'   => Give_DB_Payment_Meta::get_instance(),
 	);
 
 	return $tables;

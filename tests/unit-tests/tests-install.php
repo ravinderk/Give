@@ -142,7 +142,7 @@ class Tests_Activation extends Give_Unit_Test_Case {
 		give_install();
 
 		// Test the give_version_upgraded_from value
-		$this->assertFalse( get_option( 'give_version_upgraded_from' ) );
+		$this->assertEquals( GIVE_VERSION, get_option( 'give_version_upgraded_from' ) );
 
 		$this->assertEquals( GIVE_VERSION, get_option( 'give_version' ) );
 		$this->assertInstanceOf( 'WP_Role', get_role( 'give_manager' ) );
