@@ -20,19 +20,19 @@ class Give_Cache {
 	 * Instance.
 	 *
 	 * @since  1.8.7
-	 * @access private
+	 * @access protected
 	 * @var Give_Cache
 	 */
-	static private $instance;
+	static protected $instance;
 
 	/**
 	 * Flag to check if caching enabled or not.
 	 *
 	 * @since  2.0
-	 * @access private
+	 * @access protected
 	 * @var
 	 */
-	private $is_cache;
+	protected $is_cache;
 
 	/**
 	 * Singleton pattern.
@@ -55,6 +55,8 @@ class Give_Cache {
 	public static function get_instance() {
 		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Give_Cache ) ) {
 			self::$instance = new Give_Cache();
+
+			self::$instance->setup();
 		}
 
 		return self::$instance;
@@ -67,21 +69,28 @@ class Give_Cache {
 	 * @access public
 	 */
 	public function setup() {
-		// Currently enable cache only for backend.
-		self::$instance->is_cache = ( defined( 'GIVE_CACHE' ) ? GIVE_CACHE : give_is_setting_enabled( give_get_option( 'cache', 'enabled' ) ) ) && is_admin();
-
-		// weekly delete all expired cache.
-		Give_Cron::add_weekly_event( array( $this, 'delete_all_expired' ) );
-
-		add_action( 'save_post_give_forms', array( $this, 'delete_form_related_cache' ) );
-		add_action( 'save_post_give_payment', array( $this, 'delete_payment_related_cache' ) );
-		add_action( 'give_deleted_give-donors_cache', array( $this, 'delete_donor_related_cache' ), 10, 3 );
-		add_action( 'give_deleted_give-donations_cache', array( $this, 'delete_donations_related_cache' ), 10, 3 );
-
+		add_action( 'give_init', array( __CLASS__, '__setup_constants' ), 0 );
 		add_action( 'give_save_settings_give_settings', array( __CLASS__, 'flush_cache' ) );
 
 		add_action( 'wp', array( __CLASS__,  'prevent_caching' ) );
 		add_action( 'admin_notices', array( $this, '__notices' ) );
+	}
+
+	/**
+	 * Setup constants
+	 * Note: only for internal use
+	 *
+	 * @since 2.4.0
+	 * @access public
+	 *
+	 */
+	public function __setup_constants(){
+		// Currently enable cache only for backend.
+		self::$instance->is_cache = (
+			defined( 'GIVE_CACHE' )
+				? GIVE_CACHE
+				: give_is_setting_enabled( give_get_option( 'cache', 'enabled' ) )
+		) && is_admin();
 	}
 
 	/**
@@ -142,6 +151,7 @@ class Give_Cache {
 			return;
 		}
 
+		/* @var W3_Config $config */
 		$config   = w3_instance( 'W3_Config' );
 		$enabled  = $config->get_integer( 'dbcache.enabled' );
 		$settings = array_map( 'trim', $config->get_array( 'dbcache.reject.sql' ) );
@@ -301,61 +311,6 @@ class Give_Cache {
 
 		return $result;
 	}
-
-	/**
-	 * Delete all logging cache.
-	 *
-	 * Note: only for internal use
-	 *
-	 * @since  1.8.7
-	 * @access public
-	 * @global wpdb $wpdb
-	 *
-	 * @param bool  $force If set to true then all cached values will be delete instead of only expired
-	 *
-	 * @return bool
-	 */
-	public static function delete_all_expired( $force = false ) {
-		global $wpdb;
-		$options = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT option_name, option_value
-						FROM {$wpdb->options}
-						Where option_name
-						LIKE '%%%s%%'",
-				'give_cache'
-			),
-			ARRAY_A
-		);
-
-		// Bailout.
-		if ( empty( $options ) ) {
-			return false;
-		}
-
-		$current_time = current_time( 'timestamp', 1 );
-
-		// Delete log cache.
-		foreach ( $options as $option ) {
-			$option['option_value'] = maybe_unserialize( $option['option_value'] );
-
-			if (
-				(
-					! self::is_valid_cache_key( $option['option_name'] )
-					|| ! is_array( $option['option_value'] ) // Backward compatibility (<1.8.7).
-					|| ! array_key_exists( 'expiration', $option['option_value'] ) // Backward compatibility (<1.8.7).
-					|| empty( $option['option_value']['expiration'] )
-					|| ( $current_time < $option['option_value']['expiration'] )
-				)
-				&& ! $force
-			) {
-				continue;
-			}
-
-			self::delete( $option['option_name'] );
-		}
-	}
-
 
 	/**
 	 * Get list of options like.
@@ -582,110 +537,7 @@ class Give_Cache {
 	}
 
 
-	/**
-	 * Delete form related cache
-	 * Note: only use for internal purpose.
-	 *
-	 * @since  2.0
-	 * @access public
-	 *
-	 * @param int $form_id
-	 */
-	public function delete_form_related_cache( $form_id ) {
-		// If this is just a revision, don't send the email.
-		if ( wp_is_post_revision( $form_id ) ) {
-			return;
-		}
 
-		$donation_query = new Give_Payments_Query(
-			array(
-				'number'     => - 1,
-				'give_forms' => $form_id,
-				'output'     => '',
-				'fields'     => 'ids',
-			)
-		);
-
-		$donations = $donation_query->get_payments();
-
-		if ( ! empty( $donations ) ) {
-			/* @var Give_Payment $donation */
-			foreach ( $donations as $donation_id ) {
-				wp_cache_delete( $donation_id, $this->filter_group_name( 'give-donations' ) );
-				wp_cache_delete( give_get_payment_donor_id( $donation_id ), $this->filter_group_name( 'give-donors' ) );
-			}
-		}
-
-		self::$instance->get_incrementer( true );
-	}
-
-	/**
-	 * Delete payment related cache
-	 * Note: only use for internal purpose.
-	 *
-	 * @since  2.0
-	 * @access public
-	 *
-	 * @param int $donation_id
-	 */
-	public function delete_payment_related_cache( $donation_id ) {
-		// If this is just a revision, don't send the email.
-		if ( wp_is_post_revision( $donation_id ) ) {
-			return;
-		}
-
-		if ( $donation_id && ( $donor_id = give_get_payment_donor_id( $donation_id ) ) ) {
-			wp_cache_delete( $donor_id, $this->filter_group_name( 'give-donors' ) );
-		}
-
-		wp_cache_delete( $donation_id, $this->filter_group_name( 'give-donations' ) );
-
-		self::$instance->get_incrementer( true );
-	}
-
-	/**
-	 * Delete donor related cache
-	 * Note: only use for internal purpose.
-	 *
-	 * @since  2.0
-	 * @access public
-	 *
-	 * @param string $id
-	 * @param string $group
-	 * @param int    $expire
-	 */
-	public function delete_donor_related_cache( $id, $group, $expire ) {
-		$donation_ids = Give()->donors->get_column( 'payment_ids', $id );
-
-		if ( ! empty( $donation_ids ) ) {
-			$donation_ids = array_map( 'trim', (array) explode( ',', trim( $donation_ids  ) ) );
-
-			foreach ( $donation_ids as $donation ) {
-				wp_cache_delete( $donation, $this->filter_group_name( 'give-donations' ) );
-			}
-		}
-
-		self::$instance->get_incrementer( true );
-	}
-
-	/**
-	 * Delete donations related cache
-	 * Note: only use for internal purpose.
-	 *
-	 * @since  2.0
-	 * @access public
-	 *
-	 * @param string $id
-	 * @param string $group
-	 * @param int    $expire
-	 */
-	public function delete_donations_related_cache( $id, $group, $expire ) {
-		if ( $id && ( $donor_id = give_get_payment_donor_id( $id ) ) ) {
-			wp_cache_delete( $donor_id, $this->filter_group_name( 'give-donors' ) );
-		}
-
-		self::$instance->get_incrementer( true );
-	}
 
 
 	/**
@@ -752,13 +604,13 @@ class Give_Cache {
 	 * Filter the group name
 	 *
 	 * @since  2.0
-	 * @access private
+	 * @access public
 	 *
 	 * @param $group
 	 *
 	 * @return mixed
 	 */
-	private function filter_group_name( $group ) {
+	public function filter_group_name( $group ) {
 		/**
 		 * Filter the group name
 		 *
@@ -808,4 +660,4 @@ class Give_Cache {
 }
 
 // Initialize
-Give_Cache::get_instance()->setup();
+Give_Cache::get_instance();

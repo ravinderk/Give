@@ -466,6 +466,10 @@ if ( ! class_exists( 'Give' ) ) :
 		private function includes() {
 			global $give_options;
 
+			require_once GIVE_PLUGIN_DIR . 'includes/class-give-cache.php';
+			require_once GIVE_PLUGIN_DIR . 'includes/class-give-cache-donation-form.php';
+			require_once GIVE_PLUGIN_DIR . 'includes/class-give-cache-donation.php';
+			require_once GIVE_PLUGIN_DIR . 'includes/class-give-cache-donor.php';
 			require_once GIVE_PLUGIN_DIR . 'includes/class-give-cache-setting.php';
 
 
@@ -501,7 +505,6 @@ if ( ! class_exists( 'Give' ) ) :
 
 			require_once GIVE_PLUGIN_DIR . 'includes/class-give-cron.php';
 			require_once GIVE_PLUGIN_DIR . 'includes/class-give-async-process.php';
-			require_once GIVE_PLUGIN_DIR . 'includes/class-give-cache.php';
 			require_once GIVE_PLUGIN_DIR . 'includes/post-types.php';
 			require_once GIVE_PLUGIN_DIR . 'includes/filters.php';
 			require_once GIVE_PLUGIN_DIR . 'includes/api/class-give-api.php';
