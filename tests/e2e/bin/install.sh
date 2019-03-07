@@ -13,8 +13,21 @@ if [[ ${TRAVIS_PHP_VERSION:0:3} != "5.3" ]] && [ "${TRAVIS_BRANCH}" == 'master' 
 	cd ~/wordpress_data/wp-content/plugins/give/
 	docker exec give_wordpress_1 wp plugin activate give
 	composer install
-	rm package-lock.json
+	rm -rf ./node_modules package.json .babelrc package-lock.json
+	npm cache clean --force
+	echo 'Latest package.json file:';
+	wget https://raw.githubusercontent.com/ravinderk/Give/master/package.json
+	cat package.json
+	echo 'Latest .babelrc file:';
+	wget https://raw.githubusercontent.com/ravinderk/Give/master/.babelrc
+	cat .babelrc
+	node --version
+	npm --version
 	npm install
+	echo 'Who needs babel-core';
+	npm outdated
+	npm ls --only=dev --depth=0
+	npx npm-why babel-core
 	npm run dev
 	npm run test
 
