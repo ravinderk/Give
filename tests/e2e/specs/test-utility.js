@@ -258,7 +258,6 @@ const helpers = {
 		 * @param {array}  matchers Puppeteer page object.
 		 */
 		verifyDonation: function( page, matchers = [] ) {
-
 			// Check if we're on /donation-confirmation page.
 			it( 'EXISTENCE: verify donation confirmation URL', async () => {
 				const donationConfirmationUrl = await page.url()
@@ -269,7 +268,7 @@ const helpers = {
 			// Match every text node on /donation-confirmation page.
 			for( let matcher of matchers ) {
 				it( `EXISTENCE: verify the donation confirmation page for "${matcher}"`, async () => {
-					await expect( page ).toMatch( matcher )
+					await expect( page ).toMatch( matcher, { polling: 30000 } )
 				}, 100000)
 			}
 		},
