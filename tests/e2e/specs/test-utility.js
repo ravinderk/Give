@@ -26,26 +26,28 @@ const helpers = {
 					await Promise.all([
 						page.goto( `${helpers.vars.rootUrl}/wp-admin` ),
 						page.waitForNavigation( { waitUntil: 'networkidle2' } )
-					])
+					]).then(function(){
+						page.waitForSelector( 'form[id="loginform"]' );
 
-					// Fill the login form with the username and password values.
-					await expect( page ).toFillForm( 'form[id="loginform"]', {
-						log: credentials.username,
-						pwd: credentials.password,
-					}, {
-						// This is a preventive measure in case if the form is not filled quickly.
-						timeout: 500000
+						// Fill the login form with the username and password values.
+						expect( page ).toFillForm( 'form[id="loginform"]', {
+							log: credentials.username,
+							pwd: credentials.password,
+						}, {
+							// This is a preventive measure in case if the form is not filled quickly.
+							timeout: 100000
+						})
 					})
 
 					/* Redirection after submission leads to race condition (known bug), below is
-					 * the workaround.
-					 */
+						 * the workaround.
+						 */
 					await Promise.all([
 						await page.click( '#wp-submit' ),
-						await page.waitForNavigation( { timeout: 500000 } ),
+						await page.waitForNavigation( { timeout: 100000 } ),
 					])
 				}
-			})
+			}, 300000 )
 		},
 
 		/**

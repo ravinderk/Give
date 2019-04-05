@@ -18,6 +18,8 @@ describe( 'Shortcode Profile Editor', () => {
 	 * when trying to access Give Profile Shortcode while being logged out.
 	 */
 	it( 'INTERACTION: login through shortcode', async () => {
+		page.waitForSelector( '#give-login-form' );
+
 		await expect( page ).toFillForm( '#give-login-form', {
 			give_user_login: 'sam.smith@gmail.com',
 			give_user_pass: 'sam12345',
