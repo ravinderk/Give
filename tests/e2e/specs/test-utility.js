@@ -28,20 +28,15 @@ const helpers = {
 					])
 
 					// Fill the login form with the username and password values.
-					await expect( page ).toFillForm( 'form[id="loginform"]', {
-						log: credentials.username,
-						pwd: credentials.password,
-					}, {
-						// This is a preventive measure in case if the form is not filled quickly.
-						timeout: 500000
-					})
+					await page.type('#user_login', credentials.username );
+					await page.type('#user_pass', credentials.password );
 
 					/* Redirection after submission leads to race condition (known bug), below is
 					 * the workaround.
 					 */
 					await Promise.all([
 						await page.click( '#wp-submit' ),
-						await page.waitForNavigation( { timeout: 500000 } ),
+						await page.waitForNavigation( { waitUntil: 'networkidle0', timeout: 500000 } ),
 					])
 				}
 			})
