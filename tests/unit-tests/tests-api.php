@@ -538,7 +538,7 @@ class Tests_API extends Give_Unit_Test_Case {
 	/**
 	 * Test Process Query
 	 */
-	public function test_process_query() {
+	public function test_process_query_1() {
 		global $wp_db_version, $wp_version;
 		var_dump( 'wpravs' );
 		var_dump( $wp_db_version );
