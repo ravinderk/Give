@@ -24,8 +24,7 @@ const helpers = {
 
 					// Go to the /wp-admin page to login to WordPress.
 					await Promise.all([
-						page.goto( `${helpers.vars.rootUrl}/wp-admin` ),
-						page.waitForNavigation( { waitUntil: 'networkidle2' } )
+						page.goto( `${helpers.vars.rootUrl}/wp-admin`, { waitUntil: 'networkidle0' } ),
 					])
 
 					// Fill the login form with the username and password values.
