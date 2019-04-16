@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 echo "Give Log: current branch is ${TRAVIS_BRANCH}";
+echo "${WP_VERSION:0:3}";
 echo "${TRAVIS_PHP_VERSION:0:3}";
 echo "${TRAVIS_EVENT_TYPE}"
 
@@ -17,8 +18,6 @@ if [[ ${TRAVIS_PHP_VERSION:0:3} != "5.3" ]]; then
 	npm cache clean --force
 	npm install
 	npm run dev
-	wp option get db_version
-	wp core version
 	npm run test
 
 
