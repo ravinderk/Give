@@ -12,6 +12,8 @@ if [[ ${TRAVIS_PHP_VERSION:0:3} != "5.3" ]]; then
 	cd ~/wordpress_data/wp-content/plugins
 	git clone -b ${TRAVIS_BRANCH} --single-branch https://github.com/ravinderk/give.git
 	cd ~/wordpress_data/wp-content/plugins/give/
+	cat ~/wordpress_data/wp-includes/version.php
+	docker exec give_wordpress_1 wp get option db_version
 	docker exec give_wordpress_1 wp plugin activate give
 	composer install
 	rm -rf ./node_modules package-lock.json
