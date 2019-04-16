@@ -17,7 +17,10 @@ if [[ ${TRAVIS_PHP_VERSION:0:3} != "5.3" ]]; then
 	npm cache clean --force
 	npm install
 	npm run dev
+	wp option get db_version
+	wp core version
 	npm run test
+
 
 else
 	echo 'Give Log: Stop frontend tests from running on branches other than master';
