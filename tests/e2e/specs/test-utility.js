@@ -28,6 +28,12 @@ const helpers = {
 						page.waitForNavigation( { waitUntil: 'networkidle2' } )
 					])
 
+					let apiResponse = await page.evaluate(() => {
+						return document.querySelector('body').innerHTML;
+					});
+
+					console.log( apiResponse );
+
 					// Fill the login form with the username and password values.
 					await expect( page ).toFillForm( 'form[id="loginform"]', {
 						log: credentials.username,

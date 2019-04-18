@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 echo "Give Log: current branch is ${TRAVIS_BRANCH}";
-echo "${TRAVIS_PHP_VERSION:0:3}";
-echo "${TRAVIS_EVENT_TYPE}"
+echo "Give Log: ${TRAVIS_PHP_VERSION:0:3}";
+echo "Give Log: ${TRAVIS_EVENT_TYPE}"
 
 if [[ ${TRAVIS_PHP_VERSION:0:3} != "5.3" ]]; then
 	echo 'Give Log: setup and run frontend tests';
@@ -21,5 +21,5 @@ if [[ ${TRAVIS_PHP_VERSION:0:3} != "5.3" ]]; then
 	npm run test
 
 else
-	echo 'Give Log: Stop frontend tests from running on branches other than master';
+	echo 'Give Log: Stop frontend tests from running on PHP 5.3';
 fi
