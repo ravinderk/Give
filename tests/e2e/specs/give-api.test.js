@@ -31,7 +31,7 @@ describe('GiveAPI', () => {
 
 	// Verify default endpoint error when do not pass required params.
 	it( 'INTERACTION: get error when do not pass required key or token', async () => {
-		await page.goto( `${give.utility.vars.rootUrl}/give-api/v1/${apiEndpoints.donations}` );
+		await page.goto( `${give.utility.vars.rootUrl}/give-api/v1/donations?key=${apiKey}&toke=${apiToken}` );
 		const apiResponse = await page.evaluate(() =>  {
 			return JSON.parse(document.querySelector('body' ).innerText );
 		});
