@@ -698,12 +698,17 @@ class Give_Updates {
 	/**
 	 * Run database upgrades
 	 *
-	 * @since  2.0
+	 * @param bool $force Forcefully start update
+	 *
 	 * @access private
+	 * @since  2.0
 	 */
-	private function run_db_update() {
+	private function run_db_update( $force = false ) {
 		// Bailout.
-		if ( $this->is_doing_updates() || ! $this->get_total_new_db_update_count() ) {
+		if (
+			$this->is_doing_updates()
+			|| ! $this->get_total_new_db_update_count()
+		) {
 			return;
 		}
 
@@ -724,7 +729,7 @@ class Give_Updates {
 			'total_percentage' => 0,
 		), '', false );
 
-		self::$background_updater->save()->dispatch();
+		self::$background_updater->save()->dispatch( $force );
 	}
 
 
@@ -745,32 +750,36 @@ class Give_Updates {
 
 	/**
 	 * Initialize updates
-	 *
-	 * @since  2.0
-	 * @access public
+	 * This ajax handle will check background update process and run on page update if
+	 * plugin will not bale to run in background.
 	 *
 	 * @return void
+	 * @access public
+	 *
+	 * @since  2.0
 	 */
 	public function __give_start_updating() {
-		// Check permission.
-		if (
-			! current_user_can( 'manage_give_settings' ) ||
-			$this->is_doing_updates()
-		) {
-			// Run update via ajax
-			self::$background_updater->dispatch();
-
-			wp_send_json_error();
-		}
-
 		// @todo: validate nonce
 		// @todo: set http method to post
 		if ( empty( $_POST['run_db_update'] ) ) {
 			wp_send_json_error();
 		}
 
-		$this->run_db_update();
+		$force = ! empty( $_POST['run_db_update'] )
+			? (bool) absint( $_POST['run_db_update'] )
+			: false;
 
+		// Check permission.
+		if (
+			! current_user_can( 'manage_give_settings' )
+			|| $this->is_doing_updates()
+		) {
+			// Run update via ajax
+			self::$background_updater->dispatch( $force );
+			wp_send_json_error();
+		}
+
+		$this->run_db_update( $force );
 		wp_send_json_success();
 	}
 
