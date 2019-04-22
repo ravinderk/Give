@@ -29,13 +29,17 @@ class Give_Background_Updater extends WP_Background_Process {
 	 * Dispatch updater.
 	 *
 	 * Updater will still run via cron job if this fails for any reason.
+	 *
+	 * @param bool $force Forcefully start update
 	 */
-	public function dispatch() {
-		if ( give_test_ajax_works() ) {
+	public function dispatch( $force = false ) {
+		if ( ! $force ) {
 			parent::dispatch();
-		} elseif ( wp_doing_ajax() ) {
-			$this->maybe_handle();
+
+			return;
 		}
+
+		$this->maybe_handle();
 	}
 
 
