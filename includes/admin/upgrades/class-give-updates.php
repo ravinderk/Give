@@ -594,7 +594,7 @@ class Give_Updates {
 
 		// Run DB updates.
 		if ( ! empty( $_GET['give-run-db-update'] ) ) {
-			// $this->run_db_update();
+			$this->run_db_update();
 		}
 
 
