@@ -1367,6 +1367,9 @@ var gravatar = require('gravatar');
 	var Give_Updates = {
 		el: {},
 
+		dbUpdateProgress: null,
+		autoPageUpdateStarted: false,
+
 		init: function () {
 			this.submit();
 			this.dismiss_message();
@@ -1389,7 +1392,7 @@ var gravatar = require('gravatar');
 				if (!$('#give-restart-upgrades').length) {
 					// Start update by ajax if background update does not work.
 					if ( ! Give.fn.getGlobalVar('ajax').length ) {
-						window.setTimeout(Give_Updates.start_db_update, 1000);
+						window.setTimeout(Give_Updates.start_db_update, 1000, 1 );
 					}
 
 					window.setTimeout(Give_Updates.get_db_updates_info, 1000, $self);
@@ -1431,13 +1434,13 @@ var gravatar = require('gravatar');
 			});
 		},
 
-		start_db_update: function start_db_update() {
+		start_db_update: function( $force = false ) {
 			$.ajax({
 				type: 'POST',
 				url: ajaxurl,
 				data: {
 					action: 'give_run_db_updates',
-					run_db_update: 1,
+					run_db_update: $force,
 					nonce: Give.fn.getGlobalVar('db_update_nonce')
 				},
 				dataType: 'json',
@@ -1451,6 +1454,21 @@ var gravatar = require('gravatar');
 		},
 
 		get_db_updates_info: function ($self) {
+			if( null !== $self.dbUpdateProgress ) {
+				let currentTime = Math.floor( new Date(new Date().toUTCString().slice(0, -4)).getTime()/1000 ); // in seconds
+
+				console.log(  currentTime - parseInt( $self.dbUpdateProgress.lastChecked ) );
+
+				if(
+					3000 < ( currentTime - parseInt( $self.dbUpdateProgress.lastChecked ) )
+					&& 0 >= parseFloat( response.data.total_percentage )
+					&& ! $self.autoPageUpdateStarted
+				){
+					console.log( 'starting on page update' );
+					$self.start_db_update(1);
+				}
+			}
+
 			$.ajax({
 				type: 'POST',
 				url: ajaxurl,
@@ -1461,6 +1479,9 @@ var gravatar = require('gravatar');
 				success: function (response) {
 					// We need to get the actual in progress form, not all forms on the page.
 					var notice_wrap = Give_Selector_Cache.get('.notice-wrap', $self.el.progress_container, true);
+
+					// Cache result.
+					$self.dbUpdateProgress = response;
 
 					if (-1 !== $.inArray('success', Object.keys(response))) {
 						if (response.success) {
