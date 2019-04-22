@@ -594,7 +594,7 @@ class Give_Updates {
 
 		// Run DB updates.
 		if ( ! empty( $_GET['give-run-db-update'] ) ) {
-			$this->run_db_update();
+			// $this->run_db_update();
 		}
 
 
@@ -839,11 +839,12 @@ class Give_Updates {
 	 */
 	public function send_ajax_response( $data, $type = '' ) {
 		$default = array(
-			'message'    => '',
-			'heading'    => '',
-			'percentage' => 0,
-			'step'       => 0,
-			'update'     => 0,
+			'message'     => '',
+			'heading'     => '',
+			'percentage'  => 0,
+			'step'        => 0,
+			'update'      => 0,
+			'lastChecked' => current_time( 'timestamp', 1 ),
 		);
 
 		// Set data.
