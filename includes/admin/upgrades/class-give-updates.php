@@ -844,7 +844,6 @@ class Give_Updates {
 			'percentage'  => 0,
 			'step'        => 0,
 			'update'      => 0,
-			'lastChecked' => current_time( 'timestamp', 1 ),
 		);
 
 		// Set data.
