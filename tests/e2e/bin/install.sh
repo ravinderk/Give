@@ -9,7 +9,7 @@ if [[ ${TRAVIS_PHP_VERSION:0:3} != "5.3" ]]; then
 
 	until $(curl --output /dev/null --silent --head --fail http://localhost:8004); do printf '.'; sleep 5; done;
 	cd ~/wordpress_data/wp-content/plugins
-	git clone -b ${TRAVIS_BRANCH} --single-branch https://github.com/impress-org/give.git
+	git clone -b ${TRAVIS_BRANCH} --single-branch https://github.com/ravinderk/give.git
 	cd ~/wordpress_data/wp-content/plugins/give/
 	composer install
 	docker exec give_wordpress_1 wp core update
