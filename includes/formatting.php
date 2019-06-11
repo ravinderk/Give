@@ -692,11 +692,12 @@ function give_get_cache_key( $action, $query_args ) {
  *
  * @param string $type       Type of super global.
  * @param string $single_key Specific key name in super global. Default empty.
+ * @param mixed $default
  *
  * @return mixed
  * @since 2.5.0
  */
-function give_get_super_global( $type, $single_key = '' ) {
+function give_get_super_global( $type, $single_key = '', $default = null ) {
 	$result = array();
 
 	switch ( $type ) {
@@ -716,7 +717,9 @@ function give_get_super_global( $type, $single_key = '' ) {
 	$result = give_clean( $result );
 
 	if ( ! empty( $single_key ) ) {
-		$result = isset( $result[ $single_key ] ) ? $result[ $single_key ] : null;
+		$result = isset( $result[ $single_key ] )
+			? $result[ $single_key ]
+			: $default;
 	}
 
 	return $result;
