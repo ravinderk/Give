@@ -712,6 +712,10 @@ function give_get_super_global( $type, $single_key = '', $default = null ) {
 		case 'SERVER':
 			$result = filter_input_array( INPUT_SERVER );
 			break;
+
+		case 'COOKIE':
+			$result = filter_input_array( INPUT_SERVER );
+			break;
 	}
 
 	$result = give_clean( $result );
