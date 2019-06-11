@@ -1107,7 +1107,7 @@ function _give_get_prefill_form_field_values( $form_id ) {
 		);
 	endif;
 
-	// Bailout: Auto fill form field values only form form which donor is donating.
+	// Bailout: Auto fill form field values only donation form from which donor is donating.
 	if (
 		empty( $_GET['form-id'] )
 		|| ! $form_id
