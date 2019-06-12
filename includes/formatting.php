@@ -739,7 +739,7 @@ function give_get_super_global( $type, $single_key = '', $default = null, $raw =
  *
  * @param string  $type       Type of super global.
  * @param string  $single_key Specific key name in super global. Default empty.
- * @param boolean $is_empty   
+ * @param boolean $is_empty
  *
  * @return mixed
  * @since 2.5.0
@@ -750,7 +750,7 @@ function give_is_super_global_has_key( $type, $single_key, $is_empty = true ) {
 
 	if ( ! empty( $single_key ) ) {
 		$result = $is_empty
-			? empty( $data[$single_key] )
+			? ! empty( $data[$single_key] )
 			: array_key_exists( $single_key, $data );
 	}
 
