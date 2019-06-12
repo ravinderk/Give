@@ -737,18 +737,21 @@ function give_get_super_global( $type, $single_key = '', $default = null, $raw =
 /**
  * Get result if param exist in super global or not
  *
- * @param string $type       Type of super global.
- * @param string $single_key Specific key name in super global. Default empty.
+ * @param string  $type       Type of super global.
+ * @param string  $single_key Specific key name in super global. Default empty.
+ * @param boolean $is_empty   
  *
  * @return mixed
  * @since 2.5.0
  */
-function give_is_super_global_has_key( $type, $single_key ) {
+function give_is_super_global_has_key( $type, $single_key, $is_empty = true ) {
 	$result = false;
 	$data   = give_get_super_global( $type );
 
 	if ( ! empty( $single_key ) ) {
-		$result = array_key_exists( $single_key, $data );
+		$result = $is_empty
+			? empty( $data[$single_key] )
+			: array_key_exists( $single_key, $data );
 	}
 
 	return $result;
