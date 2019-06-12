@@ -735,6 +735,26 @@ function give_get_super_global( $type, $single_key = '', $default = null, $raw =
 }
 
 /**
+ * Get result if param exist in super global or not
+ *
+ * @param string $type       Type of super global.
+ * @param string $single_key Specific key name in super global. Default empty.
+ *
+ * @return mixed
+ * @since 2.5.0
+ */
+function give_is_super_global_has_key( $type, $single_key ) {
+	$result = false;
+	$data   = give_get_super_global( $type );
+
+	if ( ! empty( $single_key ) ) {
+		$result = array_key_exists( $single_key, $data );
+	}
+
+	return $result;
+}
+
+/**
  * Clean variables using sanitize_text_field. Arrays are cleaned recursively.
  * Non-scalar values are ignored.
  *
