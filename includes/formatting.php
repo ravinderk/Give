@@ -692,33 +692,38 @@ function give_get_cache_key( $action, $query_args ) {
  *
  * @param string $type       Type of super global.
  * @param string $single_key Specific key name in super global. Default empty.
- * @param mixed $default
+ * @param mixed  $default
+ * @param bool   $raw
  *
  * @return mixed
  * @since 2.5.0
  */
-function give_get_super_global( $type, $single_key = '', $default = null ) {
+function give_get_super_global( $type, $single_key = '', $default = null, $raw = false ) {
 	$result = array();
 
 	switch ( $type ) {
 		case 'POST':
-			$result = filter_input_array( INPUT_POST );
+			$result = $raw ? INPUT_POST : filter_input_array( INPUT_POST );
 			break;
 
 		case 'GET':
-			$result = filter_input_array( INPUT_GET );
+			$result = $raw ? INPUT_GET : filter_input_array( INPUT_GET );
+			break;
+
+		case 'REQUEST':
+			$result = $raw ? INPUT_REQUEST : filter_input_array( INPUT_REQUEST );
 			break;
 
 		case 'SERVER':
-			$result = filter_input_array( INPUT_SERVER );
+			$result = $raw ? INPUT_SERVER : filter_input_array( INPUT_SERVER );
 			break;
 
 		case 'COOKIE':
-			$result = filter_input_array( INPUT_SERVER );
+			$result = $raw ? INPUT_COOKIE : filter_input_array( INPUT_COOKIE );
 			break;
 	}
 
-	$result = give_clean( $result );
+	$result = $raw ? $result : give_clean( $result );
 
 	if ( ! empty( $single_key ) ) {
 		$result = isset( $result[ $single_key ] )
