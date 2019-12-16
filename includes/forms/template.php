@@ -1543,7 +1543,7 @@ function give_get_login_fields( $form_id ) {
 
 
 		<div id="give-user-login-submit-<?php echo $form_id; ?>" class="give-clearfix">
-			<input type="submit" class="give-submit give-btn button" name="give_login_submit"
+			<input type="submit" class="give-submit give-btn button give-primary-bg" name="give_login_submit"
 			       value="<?php _e( 'Login', 'give' ); ?>"/>
 			<?php if ( $show_register_form !== 'login' ) { ?>
 				<input type="button" data-action="give_cancel_login"
@@ -1934,7 +1934,7 @@ function give_get_donation_form_submit_button( $form_id, $args = array() ) {
 	ob_start();
 	?>
 	<div class="give-submit-button-wrap give-clearfix">
-		<input type="submit" class="give-submit give-btn" id="give-purchase-button" name="give-purchase"
+		<input type="submit" class="give-submit give-btn give-primary-bg" id="give-purchase-button" name="give-purchase"
 		       value="<?php echo $display_label; ?>" data-before-validation-label="<?php echo $display_label; ?>"/>
 		<span class="give-loading-animation"></span>
 	</div>
