@@ -86,7 +86,8 @@ class Money {
 			$currenciesData = give_get_currencies( 'all' );
 		}
 
-		return $currenciesData[ $currency ];
+		// return $currenciesData[ $currency ];
+		return give_get_currencies( 'all' )[ $currency ];
 	}
 
 	/**
